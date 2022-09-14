@@ -40,11 +40,11 @@ async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = 
 
     else:
         if not user:
-	        raise HTTPException(
-	            status_code=status.HTTP_401_UNAUTHORIZED,
-	            detail="Incorrect username or password",
-	            headers={"WWW-Authenticate": "Bearer"},
-	        )
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     
     return templates.TemplateResponse("auth/login.html", {"request": request})
 

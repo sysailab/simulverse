@@ -16,9 +16,23 @@
 
 <main role="main" class="container">
     <div class="row">
-        <div class="col">
-            {{data.text|safe}}
+        {% for key, jumbo in data.items() %}
+	    <div class="jumbotron">
+            <!-- Region name-->
+            <h3>{{key}}</h3>
+            {% for k, item in jumbo.items() %}
+            <p>{{k}}</p><a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
+                role="button">{{item}} »</a>
+            {% endfor %}
+            <p></p>
+            <a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
+                role="button">Update Space »</a>
+            <a class="btn btn-lg btn-danger" href="/region/62abfcc4aee85a0022e190f9"
+                role="button">Delete Space »</a>
         </div>
+        <p></p>
+        <p></p>
+	    {% endfor %}
     </div>
 </main><!-- /.container -->
 

@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request):
-    data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: Home.</p>'}  
+    data = {'jaiyun': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}, 'seyoung': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
 
 @router.get("/scene/{scene_id}", response_class=HTMLResponse)
@@ -32,6 +32,11 @@ async def scene_manage(request: Request):
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request):
+    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
+    return templates.TemplateResponse("page.html", {"request": request, "data": data})
+
+@router.get("/create/", response_class=HTMLResponse)
+async def create(request: Request):
     data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
 
