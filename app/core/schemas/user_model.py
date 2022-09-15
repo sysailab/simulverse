@@ -23,6 +23,8 @@ class UserRegisterForm:
         self.username = form.get("username")
         self.email = form.get("email")
         self.password = form.get("password")
+        self.rpassword = form.get("rpassword")
+        self.agreement = form.get("agreement")
 
     async def is_valid(self):
         if not self.username or not len(self.username) > 3:
@@ -31,6 +33,10 @@ class UserRegisterForm:
             self.errors.append("Email is required")
         if not self.password or not len(self.password) >= 4:
             self.errors.append("Password must be > 4 chars")
+        if self.password != self.rpassword:
+            self.errors.append("You have entered different password.")
+        if self.agreement == None:
+            self.errors.append("You should agree Terms of service")
         if not self.errors:
             return True
         return False
