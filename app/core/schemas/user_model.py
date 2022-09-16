@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class UserModel(BaseModel):
     userid: str | None = None
     email: str | None = None
-    is_active: bool | None = None
 
 class UserInDB(UserModel):
     hashed_password: str = ""

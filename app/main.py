@@ -20,6 +20,8 @@ from app.core.routers import page_tmp
 from app.core.routers import login
 
 BASE_DIR = dirname(abspath(__file__))
+templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'core/templates')))
+print(str(Path(BASE_DIR, 'core/templates')))
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=str(Path(BASE_DIR, 'static'))), name="static")
@@ -54,3 +56,8 @@ async def read_users_me(current_user: UserModel = Depends(get_current_active_use
 @app.get("/users/me/items/")
 async def read_own_items(current_user: UserModel = Depends(get_current_active_user)):
     return [{"item_id": "Foo", "owner": current_user.userid}]
+
+@app.exception_handler(HTTPException)
+async def unicorn_exception_handler(request: Request, exc: HTTPException):
+    data = {'alert': "True", 'msg':"Authorization Failed"}
+    return templates.TemplateResponse("error.html", {"request": request, "data": data})

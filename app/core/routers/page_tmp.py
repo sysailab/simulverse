@@ -1,11 +1,12 @@
 from fastapi.responses import HTMLResponse
 from os.path import dirname, abspath
 from pathlib import Path
-from fastapi import APIRouter, Depends, Request, responses, status
+from fastapi import APIRouter, Depends, Request, responses, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from ..models.database import db_manager
 from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..models.auth_manager import auth_manager, get_current_user
 
 router = APIRouter(include_in_schema=False)
 
@@ -40,6 +41,12 @@ async def create(request: Request):
     data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
 
+@router.get("/vr/", response_class=HTMLResponse)
+async def vr(request: Request, auth_user= Depends(get_current_user)):
+    
+    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
+    return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data})
+        
 #@router.get("/login/", response_class=HTMLResponse)
 #async def login(request: Request):
 #    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: authentication.</p>'}  

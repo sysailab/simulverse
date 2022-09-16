@@ -44,7 +44,6 @@ class db_manager(object):
             data = UserInDB()
             data.userid = user.username
             data.email = user.email
-            data.is_active = False
             data.hashed_password = get_password_hash(user.password)
             document = jsonable_encoder(data)
             await db_manager.get_collection('users').insert_one(document) 
