@@ -1,0 +1,112 @@
+{% extends "base.html" %} {% block title %}Simulverse Management System{%
+endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
+%} {% include 'include/sidebar.html' %}
+<!-- 로그인 화면-->>
+<main role="main" class="container">
+  <div class="row">
+    <div class="text-danger font-weight-bold">
+      {% for error in errors %}
+      <li>{{error}}</li>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="row">
+    <form method="POST">
+      <section class="vh-100">
+        <div class="container">
+          <p></p>
+          <h4 class="mb-3">Create Space</h4>
+        </div>
+
+        <!-- input space name -->
+        <div class="container">
+          <label for="space_name">Space Name</label>
+          <input
+            class="form-control"
+            id="space_name"
+            placeholder="space name"
+          />
+        </div>
+
+        <!-- input space explain -->
+        <div class="container">
+          <p></p>
+          <label for="space_ex">Space explain</label>
+          <textarea class="form-control" id="space_ex" rows="3"></textarea>
+        </div>
+
+        <!-- invite user  -->
+        <div class="container">
+          <p></p>
+          <label for="space_name">Invite User</label>
+          <form>
+            <div class="row">
+              <div class="col">
+                <!-- input user emial  -->
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="user e-mail"
+                />
+              </div>
+
+              <div class="col">
+                <div class="rendered-form">
+                  <div
+                    class="formbuilder-select form-group field-select-1663202575407"
+                  >
+                    <!-- select user access  -->
+                    <select
+                      class="form-control"
+                      name="select-access"
+                      id="access"
+                    >
+                      <option value="viewer" selected="true" id="select-editor">
+                        Viewer
+                      </option>
+                      <option value="editor" id="select-editor">Editor</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col">
+                <button
+                  class="btn btn-primary"
+                  border:none
+                  type="submit"
+                  value="input"
+                >
+                  assign
+                </button>
+                <button
+                  class="btn btn-danger"
+                  border:none
+                  type="submit"
+                  value="input"
+                >
+                  delete
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="container">
+          <p></p>
+          <button
+            class="btn btn-primary btn-lg btn-block"
+            border:none
+            type="submit"
+            value="input"
+          >
+            create
+          </button>
+        </div>
+      </section>
+    </form>
+  </div>
+</main>
+<!-- /.container -->
+
+{% endblock %} {% block scripts %} {{ super() }} {% endblock %}
