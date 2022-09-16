@@ -1,0 +1,195 @@
+{% extends "base.html" %} {% block title %}Simulverse Management System{%
+  endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
+  %} {% include 'include/sidebar.html' %}
+  <!-- 로그인 화면-->>
+  <main role="main" class="container">
+    <div class="row">
+      <div class="text-danger font-weight-bold">
+        {% for error in errors %}
+        <li>{{error}}</li>
+        {% endfor %}
+      </div>
+    </div>
+  
+    <div class="row">
+      <form method="POST">
+        <section class="vh-100">
+          <div class="container">
+            <script>
+              function deleteMe(id) {
+                var url = "/admin/regions/delete/" + id;
+                $.ajax({
+                  type: "DELETE",
+                  url: url,
+                  data: id,
+                  success: function (response) {
+                    window.location.href = "/admin/regions/";
+                  },
+                });
+              }
+      
+              function deleteVRScene(id) {
+                var url = "/admin/regions/vrscene_del/" + id;
+                $.ajax({
+                  type: "DELETE",
+                  url: url,
+                  data: id,
+                  success: function (response) {
+                    window.location.href = "/admin/regions/";
+                  },
+                });
+              }
+            </script>
+            <div class="jumbotron">
+              <p>Dongwon1</p>
+              <p>Dongwon1</p>
+              <div></div>
+              1. dongwon :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1b22aee85a0022e19483"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1b22aee85a0022e19483');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1. Provence :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1b58aee85a0022e194be"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1b58aee85a0022e194be');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.Barcelona :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1b88aee85a0022e194de"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1b88aee85a0022e194de');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.Eiffel Tower :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1bdfaee85a0022e1950a"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1bdfaee85a0022e1950a');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.grinich :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1f78aee85a0022e1988b"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1f78aee85a0022e1988b');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.science :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac1fcdaee85a0022e198b0"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac1fcdaee85a0022e198b0');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1. isle :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac206faee85a0022e198f6"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac206faee85a0022e198f6');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.niagara :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac215daee85a0022e19924"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac215daee85a0022e19924');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <div></div>
+              1.last :
+              <a
+                class="btn btn-sm btn-primary"
+                href="/admin/regions/update_vr/62ac21f6aee85a0022e19950"
+                role="button"
+                >Update Scene</a
+              ><a
+                class="btn btn-sm btn-danger"
+                role="button"
+                onclick="deleteVRScene('62ac21f6aee85a0022e19950');"
+                >Delete Scene</a
+              >
+              <p></p>
+              <a
+                class="btn btn-primary"
+                href="/admin/regions/add_vr/62abfcc4aee85a0022e190f9"
+                role="button"
+                >Add VR »</a
+              ><a
+                class="btn btn-danger"
+                role="button"
+                onclick="deleteMe('62abfcc4aee85a0022e190f9');"
+                >Delete Region</a
+              >
+            </div>
+      
+            <a class="btn btn-primary" href="/admin/regions/new" role="button"
+              >Add new region</a
+            >
+          </div>
+      </form>
+    </div>
+  </main>
+  <!-- /.container -->
+  
+  {% endblock %} {% block scripts %} {{ super() }} {% endblock %}
+  

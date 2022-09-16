@@ -1,0 +1,52 @@
+{% extends "base.html" %} {% block title %}Simulverse Management System{%
+endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
+%} {% include 'include/sidebar.html' %}
+<!--view 클릭 시 list-->>
+<main role="main" class="container">
+  <div class="row">
+    <div class="text-danger font-weight-bold">
+      {% for error in errors %}
+      <li>{{error}}</li>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="row">
+    <form method="POST">
+      <div class="container">
+        <!--Iteration for listing village item-->
+        <div class="jumbotron">
+          <!-- Region name-->
+          <h3>Dongwon1</h3>
+          <p>Dongwon1</p>
+          <a
+            class="btn btn-lg btn-primary"
+            href="/region/62abfcc4aee85a0022e190f9"
+            role="button"
+            >Detail »</a
+          >
+        </div>
+        <p></p>
+      </div>
+
+      <div class="container">
+        <!--Iteration for listing village item-->
+        <div class="jumbotron">
+          <!-- Region name-->
+          <h3>Dongwon2</h3>
+          <p>Dongwon2</p>
+          <a
+            class="btn btn-lg btn-primary"
+            href="/region/62abfcc4aee85a0022e190f9"
+            role="button"
+            >Detail »</a
+          >
+        </div>
+        <p></p>
+      </div>
+    </form>
+  </div>
+</main>
+<!-- /.container -->
+
+{% endblock %} {% block scripts %} {{ super() }} {% endblock %}
