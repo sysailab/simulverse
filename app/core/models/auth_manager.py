@@ -15,7 +15,7 @@ from ..instance import config
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/token")
+oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/token", auto_error=False)
 
 class auth_manager(object):
     @classmethod
@@ -45,6 +45,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     headers={"WWW-Authenticate": "Bearer"},
     )
     try:
+        if not token:
+            raise credentials_exception
         payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM])
         userid: str = payload.get("sub")
         print(userid)

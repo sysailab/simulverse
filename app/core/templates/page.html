@@ -14,6 +14,11 @@
     {% include "include/alerts.html" %}
 {% endwith %}
 
+{% if data.alert == "True" %}
+  <div class="alert alert-info" role="alert">
+    {{data.msg}}
+  </div>
+{% endif %}
 <main role="main" class="container">
     <div class="row">
         {% for key, jumbo in data.items() %}
