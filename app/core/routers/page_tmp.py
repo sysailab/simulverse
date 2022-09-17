@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from ..models.database import db_manager
 from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
 from ..models.auth_manager import auth_manager, get_current_user
+from ..schemas.space_model import CreateSpaceForm
 
 router = APIRouter(include_in_schema=False)
 
@@ -39,7 +40,14 @@ async def view(request: Request):
 @router.get("/create/", response_class=HTMLResponse)
 async def create(request: Request):
     data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
+    return templates.TemplateResponse("ref/create_spce.html", {"request": request, "data": data})
+
+@router.post("/create/", response_class=HTMLResponse)
+async def handle_create(request: Request, form_data:CreateSpaceForm = Depends() ):
+    form = CreateSpaceForm(request)
+    await form.load_data()
+    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
+    return templates.TemplateResponse("ref/create_spce.html", {"request": request, "data": data})
 
 @router.get("/vr/", response_class=HTMLResponse)
 async def vr(request: Request, auth_user= Depends(get_current_user)):
