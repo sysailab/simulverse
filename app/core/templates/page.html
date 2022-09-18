@@ -14,30 +14,31 @@
     {% include "include/alerts.html" %}
 {% endwith %}
 
-{% if data.alert == "True" %}
-  <div class="alert alert-info" role="alert">
-    {{data.msg}}
-  </div>
-{% endif %}
 <main role="main" class="container">
     <div class="row">
-        {% for key, jumbo in data.items() %}
-	    <div class="jumbotron">
-            <!-- Region name-->
-            <h3>{{key}}</h3>
-            {% for k, item in jumbo.items() %}
-            <p>{{k}}</p><a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
-                role="button">{{item}} »</a>
-            {% endfor %}
-            <p></p>
-            <a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
-                role="button">Update Space »</a>
-            <a class="btn btn-lg btn-danger" href="/region/62abfcc4aee85a0022e190f9"
-                role="button">Delete Space »</a>
+        <div class="jumbotron">
+            {{data.text|safe}}
         </div>
-        <p></p>
-        <p></p>
-	    {% endfor %}
+        
+        {% if login is sameas true%}
+            {% for key, jumbo in data.spaces.items() %}
+            <div class="jumbotron">
+                <!-- Region name-->
+                <h3>{{key}}</h3>
+                {% for k, item in jumbo.items() %}
+                <p>{{k}}</p><a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
+                    role="button">{{item}} »</a>
+                {% endfor %}
+                <p></p>
+                <a class="btn btn-lg btn-primary" href="/region/62abfcc4aee85a0022e190f9"
+                    role="button">Update Space »</a>
+                <a class="btn btn-lg btn-danger" href="/region/62abfcc4aee85a0022e190f9"
+                    role="button">Delete Space »</a>
+            </div>
+            <p></p>
+            <p></p>
+            {% endfor %}
+        {% endif %}
     </div>
 </main><!-- /.container -->
 

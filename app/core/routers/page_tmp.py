@@ -18,9 +18,13 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 
 @router.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    data = {'jaiyun': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}, 'seyoung': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
+async def root(request: Request, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n<p>Please Log-in or Sign-up.</p>'}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
+    else:
+        data = {'text':'<h1>Welcome to the Simulverse Management System </h1>', 'spaces':{'jaiyun': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}, 'seyoung': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}}}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True})
 
 @router.get("/scene/{scene_id}", response_class=HTMLResponse)
 async def get_scene(request: Request, scene_id: int):
@@ -36,18 +40,6 @@ async def scene_manage(request: Request):
 async def view(request: Request):
     data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
-
-@router.get("/create/", response_class=HTMLResponse)
-async def create(request: Request):
-    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
-    return templates.TemplateResponse("ref/create_spce.html", {"request": request, "data": data})
-
-@router.post("/create/", response_class=HTMLResponse)
-async def handle_create(request: Request, form_data:CreateSpaceForm = Depends() ):
-    form = CreateSpaceForm(request)
-    await form.load_data()
-    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
-    return templates.TemplateResponse("ref/create_spce.html", {"request": request, "data": data})
 
 @router.get("/vr/", response_class=HTMLResponse)
 async def vr(request: Request, auth_user= Depends(get_current_user)):

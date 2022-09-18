@@ -1,14 +1,22 @@
 from fastapi import Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from bson.objectid import ObjectId
+
+from ..libs.pyobjectid import PyObjectId
 
 class UserModel(BaseModel):
-    userid: str | None = None
-    email: str | None = None
+    userid: str  = ""
+    email: str = ""
 
 class UserInDB(UserModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     hashed_password: str = ""
-
-
+    spaces:dict = {}
+    class Config:
+        allow_population_by_field_name = True
+        arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+    
 class UserRegisterForm: 
     def __init__(self, request: Request):
         self.request: Request = request
