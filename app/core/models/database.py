@@ -68,33 +68,14 @@ class db_manager(object):
         
         userdata = await cls.get_user(creator)
         print(userdata)
-        pass
-        '''
-        name: str = ""
-        explain: str = ""
-        creator: str = ""
-        viewers: dict | None = None
-        data = SpaceModel()
-        data.name = space.form_data['space_name']
-        data.explain = space.form_data['space_explain']
-        data.email = user.email
-        data.spaces = {}
-        data.hashed_password = get_password_hash(user.password)
-        document = jsonable_encoder(data)
-        await db_manager.get_collection('users').insert_one(document) 
 
-
-
-        userdata = await cls.get_user(user.username)
-        if userdata:
-            return False
-        else:
-            data = UserInDB()
-            data.userid = user.username
-            data.email = user.email
-            data.spaces = {}
-            data.hashed_password = get_password_hash(user.password)
-            document = jsonable_encoder(data)
-            await db_manager.get_collection('users').insert_one(document) 
-            return True
-        '''
+    @classmethod
+    async def get_spaces(cls, creator: UserInDB):
+        
+        spaces = []
+        for spaceid, role in creator.spaces.items():
+            cursor = await cls.get_collection("spaces").find_one({"_id":ObjectId(spaceid)})
+            print(cursor)
+            spaces.append((cursor["name"], cursor['explain'], spaceid, role))
+        
+        return spaces
