@@ -14,4 +14,4 @@ client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URL)
 db = client["simulverse"]
 
 loop = client.get_io_loop()
-loop.run_until_complete(do_check(db, ['users']))
+loop.run_until_complete(do_check(db, ['spaces']))

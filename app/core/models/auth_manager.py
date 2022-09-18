@@ -46,15 +46,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     )
     try:
         if not token:
-            raise credentials_exception
+            return None
         payload = jwt.decode(token, config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM])
+        
         userid: str = payload.get("sub")
-        print(userid)
         if userid is None:
             raise credentials_exception
         token_data = TokenData(email=userid)
-    except JWTError:
-        raise credentials_exception
+    except JWTError as exc:
+        raise  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"},)
+
     user = await db_manager.get_user(email=token_data.email)
     if user is None:
         raise credentials_exception
@@ -62,6 +63,4 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 
 
 async def get_current_active_user(current_user: UserModel = Depends(get_current_user)):
-    if current_user.is_active:
-        raise HTTPException(status_code=400, detail="Inactive user")
-    return current_user
+    return {"current_user":"user"}

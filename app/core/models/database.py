@@ -1,9 +1,14 @@
 import motor.motor_asyncio
-from ..schemas.user_model import UserRegisterForm, UserInDB
+from fastapi.encoders import jsonable_encoder
+
+from bson.objectid import ObjectId
+from ..libs.pyobjectid import PyObjectId
 from ..libs.utils import verify_password
 from ..libs.utils import get_password_hash
 
-from fastapi.encoders import jsonable_encoder
+from ..schemas.user_model import UserRegisterForm, UserInDB
+from ..schemas.space_model import CreateSpaceForm, SpaceModel
+
 
 class db_manager(object):
     client = None
@@ -41,10 +46,36 @@ class db_manager(object):
         if userdata:
             return False
         else:
-            data = UserInDB()
-            data.userid = user.username
-            data.email = user.email
-            data.hashed_password = get_password_hash(user.password)
-            document = jsonable_encoder(data)
-            await db_manager.get_collection('users').insert_one(document) 
+            data = {'userid':user.username, 'email':user.email, 'spaces':{}, 'hashed_password':get_password_hash(user.password)}
+            await db_manager.get_collection('users').insert_one(data) 
             return True
+
+    @classmethod
+    async def create_space(cls, creator: str, space:CreateSpaceForm):
+        userdata = await cls.get_user(creator)
+        viewers = {str(userdata.id):'Editor'}
+        for _id, role in zip(space.form_data['username'], space.form_data['role']):
+            view = await cls.get_user(_id)
+            if view :
+                viewers[str(view.id)] = role
+
+        data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 'creator': userdata.id, 'viewers':viewers}
+        space_id = await db_manager.get_collection('spaces').insert_one(data) 
+
+        for viewer, val in viewers.items():
+            result = await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id.inserted_id): val}}}]) 
+            print(result.modified_count, result.upserted_id)
+        
+        userdata = await cls.get_user(creator)
+        print(userdata)
+
+    @classmethod
+    async def get_spaces(cls, creator: UserInDB):
+        
+        spaces = []
+        for spaceid, role in creator.spaces.items():
+            cursor = await cls.get_collection("spaces").find_one({"_id":ObjectId(spaceid)})
+            print(cursor)
+            spaces.append((cursor["name"], cursor['explain'], spaceid, role))
+        
+        return spaces

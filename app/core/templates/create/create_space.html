@@ -1,7 +1,16 @@
-{% extends "base.html" %} {% block title %}Simulverse Management System{%
-endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
+{% extends "base.html" %} 
+{% block title %}Simulverse Management System{%endblock %} 
+
+{% block head %} 
+{{ super() }} 
+
+<script src="{{ url_for('static', path='/scripts/dynamic_fields.js') }}" crossorigin="anonymous"></script>
+
+{% endblock %} 
+
+{% block page_content
 %} {% include 'include/sidebar.html' %}
-<!-- 로그인 화면-->>
+<!-- 로그인 화면-->
 <main role="main" class="container">
   <div class="row">
     <div class="text-danger font-weight-bold">
@@ -25,7 +34,8 @@ endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
           <input
             class="form-control"
             id="space_name"
-            placeholder="space name"
+            placeholder="Enter unique space name"
+            name="space_name"
           />
         </div>
 
@@ -33,63 +43,64 @@ endblock %} {% block head %} {{ super() }} {% endblock %} {% block page_content
         <div class="container">
           <p></p>
           <label for="space_ex">Space explain</label>
-          <textarea class="form-control" id="space_ex" rows="3"></textarea>
+          <textarea class="form-control" id="space_ex" rows="3" name="space_explain"></textarea>
         </div>
 
         <!-- invite user  -->
-        <div class="container">
+        <div class="container" id="itemList">
           <p></p>
           <label for="space_name">Invite User</label>
-          <form>
-            <div class="row">
-              <div class="col">
-                <!-- input user emial  -->
+          <button class="btn btn-primary btn-sm" id="addItemBtn" onclick="addField()"> add </button>
+          <div class="row" id="listItem" hidden="true">
+            <div class="col">
+              <!-- input user email  -->
+              <div style="width: 35%; float: left;">
+              <label> Email </label>
+              </div>
+              <div style="width: 65%; float: right;">
                 <input
                   type="text"
                   class="form-control"
-                  placeholder="user e-mail"
+                  placeholder="User e-mail"
+                  name="username"
                 />
               </div>
+            </div>
 
-              <div class="col">
-                <div class="rendered-form">
-                  <div
-                    class="formbuilder-select form-group field-select-1663202575407"
-                  >
+            <div class="col">
+              <div class="rendered-form">
+                <div
+                  class="formbuilder-select form-group field-select-1663202575407"
+                >
+                  <div style="width: 30%; float: left;">
+                    <label> Role </label>
+                    </div>
+                  <div style="width: 70%; float: right;">
                     <!-- select user access  -->
                     <select
                       class="form-control"
-                      name="select-access"
+                      name="role"
                       id="access"
                     >
                       <option value="viewer" selected="true" id="select-editor">
                         Viewer
                       </option>
-                      <option value="editor" id="select-editor">Editor</option>
                     </select>
                   </div>
                 </div>
               </div>
-              <div class="col">
-                <button
-                  class="btn btn-primary"
-                  border:none
-                  type="submit"
-                  value="input"
-                >
-                  assign
-                </button>
-                <button
-                  class="btn btn-danger"
-                  border:none
-                  type="submit"
-                  value="input"
-                >
-                  delete
-                </button>
-              </div>
             </div>
-          </form>
+
+            <div class="col" id="div_del">
+              <button
+                class="btn btn-danger btn-sm"
+                border:none
+                id="del_user"
+              >
+                delete
+              </button>
+            </div>
+          </div>
         </div>
 
         <div class="container">

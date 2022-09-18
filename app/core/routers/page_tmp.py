@@ -3,23 +3,32 @@ from os.path import dirname, abspath
 from pathlib import Path
 from fastapi import APIRouter, Depends, Request, responses, HTTPException, status
 from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from jose import jwt
+
 from ..models.database import db_manager
-from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..instance import config
 from ..models.auth_manager import auth_manager, get_current_user
+from ..schemas.space_model import CreateSpaceForm
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(MONGODB_URL, "simulverse")
+db_manager.init_manager(config.MONGODB_URL, "simulverse")
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 
 @router.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    data = {'jaiyun': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}, 'seyoung': {'abc':'abcd', 'abc1':'abcd', 'abc2':'abcd'}}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
+async def root(request: Request, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n<p>Please Log-in or Sign-up.</p>'}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
+    else:
+        
+        spaces = await db_manager.get_spaces(auth_user)
+        print(spaces)
+        data = {'text':'<h1>Welcome to the Simulverse Management System </h1>', 'spaces':spaces}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True})
 
 @router.get("/scene/{scene_id}", response_class=HTMLResponse)
 async def get_scene(request: Request, scene_id: int):
@@ -33,11 +42,6 @@ async def scene_manage(request: Request):
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request):
-    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
-
-@router.get("/create/", response_class=HTMLResponse)
-async def create(request: Request):
     data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data})
 

@@ -21,7 +21,7 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 @router.get("/login/")
 def render_login(request: Request):
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return templates.TemplateResponse("auth/login.html", {"request": request, "login":False})
 
 @router.post("/login/")
 async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
@@ -46,8 +46,13 @@ async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = 
                 headers={"WWW-Authenticate": "Bearer"},
             )
     
-    return templates.TemplateResponse("auth/login.html", {"request": request})
+    return templates.TemplateResponse("auth/login.html", {"request": request, "login":False})
 
+@router.get("/logout/")
+def protected_route(request: Request):
+    response = RedirectResponse(url="/", status_code=status.HTTP_302_FOUND)
+    response.delete_cookie(key="access_token")
+    return response
     '''
     @app.post('/login', summary="Create access and refresh tokens for user", response_model=TokenSchema)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):

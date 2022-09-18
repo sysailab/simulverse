@@ -6,4 +6,4 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    email: str | str
+    email: str =""
