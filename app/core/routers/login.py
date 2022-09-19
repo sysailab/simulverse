@@ -11,6 +11,7 @@ from ..models.database import db_manager
 from ..models.auth_manager import auth_manager
 from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
 from ..schemas.user_model import UserLoginForm, UserModel
+from ..libs.resolve_error import resolve_error
 
 router = APIRouter(include_in_schema=False)
 
@@ -21,7 +22,10 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 @router.get("/login/")
 def render_login(request: Request):
-    return templates.TemplateResponse("auth/login.html", {"request": request, "login":False})
+    errors = []
+    if 'errors' in request.query_params:
+        errors = [ resolve_error(x) for x in request.query_params['errors'].split('.')]
+    return templates.TemplateResponse("auth/login.html", {"request": request, "errors":errors, "login":False})
 
 @router.post("/login/")
 async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):

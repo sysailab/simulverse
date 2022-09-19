@@ -49,5 +49,6 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @app.exception_handler(HTTPException)
 async def unicorn_exception_handler(request: Request, exc: HTTPException):
-    response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+    print("@@##")
+    response = RedirectResponse("/login/?errors=401", status_code=status.HTTP_302_FOUND)
     return response
