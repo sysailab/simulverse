@@ -22,7 +22,7 @@
     {% for k, jumbo in data.scenes.items() %}
       <div class="jumbotron">
           <!-- Scene name-->
-          <p>{{jumbo}}</p><a class="btn btn-sm btn-primary" href="/space/scence/{{k}}" role="button">view »</a>
+          <p>{{jumbo}}</p><a class="btn btn-sm btn-primary" href="/space/scene/{{k}}" role="button">view »</a>
           
           {% if data.role == 'Editor' %}
           <a class="btn btn-sm btn-primary" href="/space/edit/{{k}}"

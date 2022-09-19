@@ -1,64 +1,48 @@
-
-{% extends "base.html" %}
-
-{% block title %}Simulverse Management System{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
-
-{% block page_content %}
-{% include 'include/sidebar.html' %}
-
-{% with msg=msg %}
-    {% include "include/alerts.html" %}
-{% endwith %}
-
-<main role="main" class="container">
-    <div class="row">
-        <div class="text-danger font-weight-bold">
-          {% for error in errors %}
-          <li>{{error}}</li>
-          {% endfor %}
+<head>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+<script src="https://unpkg.com/aframe-event-set-component@5/dist/aframe-event-set-component.min.js"></script>
+<script src="https://unpkg.com/aframe-layout-component@5.3.0/dist/aframe-layout-component.min.js"></script>
+<script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
+<script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
+<script id="link" type="text/html">
+    <a-entity class="link"
+      geometry="primitive: plane; height: 1; width: 1"
+      material="shader: flat; src: ${thumb}"
+      event-set__mouseenter="scale: 1.2 1.2 1"
+      event-set__mouseleave="scale: 1 1 1"
+      event-set__click="_target: #image-360; _delay: 300; material.src: ${src}"
+      proxy-event="event: click; to: #image-360; as: fade"
+      sound="on: click; src: #click-sound"></a-entity>
+  </script>
+</head>
+<body>
+    <main role="main" class="container">
+        <div id="myEmbeddedScene" class="row">
+        <a-scene>
+            <a-assets>
+              <!-- Images. -->
+              <img id="background" src="/asset/image/{{data.background}}" crossorigin="anonymous">
+            </a-assets>
+          
+            <!-- 360-degree image. -->
+            <a-sky id="image-360" radius="10" src="#background"></a-sky>
+          
+            <!-- Link template we will build. 
+            <a-entity id="links" layout="type: line; margin: 1.5" position="0 -1 -4">
+                <a-entity template="src: #link" data-src="#cubes" data-thumb="#cubes-thumb"></a-entity>
+                <a-entity template="src: #link" data-src="#city" data-thumb="#city-thumb"></a-entity>
+                <a-entity template="src: #link" data-src="#sechelt" data-thumb="#sechelt-thumb"></a-entity>
+              </a-entity>
+          
+            Camera + Cursor. -->
+            <a-camera>
+              <a-cursor
+                id="cursor"
+                animation__click="property: scale; from: 0.1 0.1 0.1; to: 1 1 1; easing: easeInCubic; dur: 150; startEvents: click"
+                animation__clickreset="property: scale; to: 0.1 0.1 0.1; dur: 1; startEvents: animationcomplete__click"
+                animation__fusing="property: scale; from: 1 1 1; to: 0.1 0.1 0.1; easing: easeInCubic; dur: 150; startEvents: fusing"></a-cursor>
+            </a-camera>
+          </a-scene>
         </div>
-    </div>
-    
-    <div class="row">
-        <div class="jumbotron">
-            {{data.text|safe}}
-        </div>
-        
-        {% if login is sameas true%}
-            {% for jumbo in data.spaces %}
-            <div class="jumbotron">
-                <!-- Region name-->
-                <h3>{{jumbo[0]}}</h3>
-                
-                <p>{{jumbo[1]}}</p><a class="btn btn-sm btn-primary" href="/space/view/{{jumbo[2]}}" role="button">Explore »</a>
-                
-                <p></p>
-                {% if jumbo[3] == 'Editor' %}
-                <a class="btn btn-sm btn-primary" href="/space/edit/{{jumbo[2]}}"
-                    role="button">Update Space »</a>
-                <a class="btn btn-sm btn-danger" href="/space/delete/{{jumbo[2]}}"
-                    role="button">Delete Space »</a>
-                {% else %}
-                <a class="btn btn-sm btn-secondary" role="button"> Update Space »</a>
-                <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
-                {% endif %}
-            </div>
-            <p></p>
-            <p></p>
-            {% endfor %}
-        {% endif %}
-    </div>
-</main><!-- /.container -->
-
-
-{% endblock %}
-
-{% block scripts %}
-{{ super() }}
-
-
-{% endblock %}
+      </main>
+</body>

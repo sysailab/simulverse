@@ -27,7 +27,6 @@ class db_manager(object):
     @classmethod
     async def get_user(cls, email: str) -> UserInDB|None:
         document = await cls.get_collection("users").find_one({'email': email})
-        print(document, email)
         if document:
             return UserInDB(**document)
         else:
@@ -70,7 +69,6 @@ class db_manager(object):
     
     @classmethod
     async def create_scene(cls, form:CreateSceneForm, space_id:ObjectId ):
-        print(form.form_data)
         image_id = await cls.store_image(form.form_data['file'][0].filename, 
                                         form.form_data['file'][0].content_type, 
                                         form.form_data['file'][0].file )
@@ -80,9 +78,14 @@ class db_manager(object):
 
         data = {'name':form.form_data['scene_name'][0], 'image_id':image_id, 'links':{}}
         scene_id = await db_manager.get_collection('scenes').insert_one(data)
-        print(str(scene_id))
-        await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.form_data['scene_name'][0]}}}])  
+        await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.form_data['scene_name'][0]}}}]) 
 
+    @classmethod
+    async def get_scene(cls, scene_id:ObjectId ):
+        print("!", scene_id)
+        scene = await db_manager.get_collection('scenes').find_one({"_id":scene_id})
+        return scene
+            
     @classmethod
     async def get_spaces(cls, creator: UserInDB):
         spaces = []
