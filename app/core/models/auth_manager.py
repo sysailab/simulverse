@@ -20,7 +20,7 @@ oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/token", auto_error=Fal
 class auth_manager(object):
     @classmethod
     async def authenticate_user(cls, userid: str, password: str):
-        user = await db_manager.get_user(userid)
+        user = await db_manager.get_user_by_email(userid)
         if not user:
             return False
         if not verify_password(password, user.hashed_password):
@@ -56,7 +56,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
     except JWTError as exc:
         raise  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Could not validate credentials", headers={"WWW-Authenticate": "Bearer"},)
 
-    user = await db_manager.get_user(email=token_data.email)
+    user = await db_manager.get_user_by_email(email=token_data.email)
     if user is None:
         raise credentials_exception
     return user

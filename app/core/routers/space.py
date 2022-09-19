@@ -75,17 +75,29 @@ async def space(request: Request, scene_id:str, auth_user= Depends(get_current_u
 
 
 @router.get("/space/edit/{space_id}", response_class=HTMLResponse)
-async def space(request: Request, auth_user= Depends(get_current_user)):
+async def edit_space(request: Request, space_id:str, auth_user= Depends(get_current_user)):
     if not auth_user :
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        return templates.TemplateResponse("create/create_space.html", {"request": request, "data": {}, "login":True})
+        space = await db_manager.get_space(ObjectId(space_id))
+        if space.viewers[str(auth_user.id)] == 'Editor' and str(auth_user.id) in space.viewers:
+            viewers = {}
+            for user, val in space.viewers.items():
+                _user = await db_manager.get_user_by_id(ObjectId(user))
+                if auth_user.email != _user.email:
+                    viewers[_user.email] = val
 
-@router.get("/space/edit/{space_id}", response_class=HTMLResponse)
-async def space(request: Request, auth_user= Depends(get_current_user)):
+            data = {'space_name':space.name, 'space_explain':space.explain, 'invite_lists':viewers}
+            return templates.TemplateResponse("space/update_space.html", {"request": request, "data": data, "login":True})
+        else:
+            # raise Exception
+           return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})
+
+@router.post("/space/edit/{space_id}", response_class=HTMLResponse)
+async def handle_update_space(request: Request, space_id:str, auth_user= Depends(get_current_user)):
     if not auth_user :
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        return templates.TemplateResponse("create/create_space.html", {"request": request, "data": {}, "login":True})
+        return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})

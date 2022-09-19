@@ -25,8 +25,16 @@ class db_manager(object):
         return cls.db[name]
 
     @classmethod
-    async def get_user(cls, email: str) -> UserInDB|None:
+    async def get_user_by_email(cls, email: str) -> UserInDB|None:
         document = await cls.get_collection("users").find_one({'email': email})
+        if document:
+            return UserInDB(**document)
+        else:
+            return None
+    
+    @classmethod
+    async def get_user_by_id(cls, userid:ObjectId) -> UserInDB|None:
+        document = await cls.get_collection("users").find_one({'_id': userid})
         if document:
             return UserInDB(**document)
         else:
@@ -34,7 +42,7 @@ class db_manager(object):
 
     @classmethod
     async def authenticate_user(cls, userid: str, password: str):
-        user = await cls.get_user(userid)
+        user = await cls.get_user_by_email(userid)
         if not user:
             return False
         if not verify_password(password, user.hashed_password):
@@ -43,7 +51,7 @@ class db_manager(object):
 
     @classmethod
     async def create_user(cls, user:UserRegisterForm):
-        userdata = await cls.get_user(user.email)
+        userdata = await cls.get_user_by_email(user.email)
         if userdata:
             return False
         else:
@@ -53,10 +61,10 @@ class db_manager(object):
 
     @classmethod
     async def create_space(cls, creator: str, space:CreateSpaceForm):
-        userdata = await cls.get_user(creator)
+        userdata = await cls.get_user_by_email(creator)
         viewers = {str(userdata.id):'Editor'}
         for _id, role in zip(space.form_data['username'], space.form_data['role']):
-            view = await cls.get_user(_id)
+            view = await cls.get_user_by_email(_id)
             if view :
                 viewers[str(view.id)] = role
 

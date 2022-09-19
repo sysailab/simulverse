@@ -25,7 +25,7 @@ async def create(request: Request, auth_user= Depends(get_current_user)):
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        return templates.TemplateResponse("create/create_space.html", {"request": request, "data": {}, "login":True})
+        return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})
 
 @router.post("/create/", response_class=HTMLResponse)
 async def handle_create(request: Request, auth_user= Depends(get_current_user)):
