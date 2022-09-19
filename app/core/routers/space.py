@@ -60,7 +60,7 @@ async def handle_insert_scene(request: Request, space_id:str, auth_user= Depends
         await form.load_data()
         await db_manager.create_scene(form, ObjectId(space_id))
 
-        response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_308_PERMANENT_REDIRECT)
+        response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
         return response
 
 

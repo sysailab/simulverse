@@ -27,6 +27,7 @@ class db_manager(object):
     @classmethod
     async def get_user(cls, email: str) -> UserInDB|None:
         document = await cls.get_collection("users").find_one({'email': email})
+        print(document, email)
         if document:
             return UserInDB(**document)
         else:
@@ -43,7 +44,7 @@ class db_manager(object):
 
     @classmethod
     async def create_user(cls, user:UserRegisterForm):
-        userdata = await cls.get_user(user.username)
+        userdata = await cls.get_user(user.email)
         if userdata:
             return False
         else:

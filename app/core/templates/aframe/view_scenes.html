@@ -1,0 +1,64 @@
+
+{% extends "base.html" %}
+
+{% block title %}Simulverse Management System{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+
+{% with msg=msg %}
+    {% include "include/alerts.html" %}
+{% endwith %}
+
+<main role="main" class="container">
+    <div class="row">
+        <div class="text-danger font-weight-bold">
+          {% for error in errors %}
+          <li>{{error}}</li>
+          {% endfor %}
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="jumbotron">
+            {{data.text|safe}}
+        </div>
+        
+        {% if login is sameas true%}
+            {% for jumbo in data.spaces %}
+            <div class="jumbotron">
+                <!-- Region name-->
+                <h3>{{jumbo[0]}}</h3>
+                
+                <p>{{jumbo[1]}}</p><a class="btn btn-sm btn-primary" href="/space/view/{{jumbo[2]}}" role="button">Explore »</a>
+                
+                <p></p>
+                {% if jumbo[3] == 'Editor' %}
+                <a class="btn btn-sm btn-primary" href="/space/edit/{{jumbo[2]}}"
+                    role="button">Update Space »</a>
+                <a class="btn btn-sm btn-danger" href="/space/delete/{{jumbo[2]}}"
+                    role="button">Delete Space »</a>
+                {% else %}
+                <a class="btn btn-sm btn-secondary" role="button"> Update Space »</a>
+                <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
+                {% endif %}
+            </div>
+            <p></p>
+            <p></p>
+            {% endfor %}
+        {% endif %}
+    </div>
+</main><!-- /.container -->
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}
