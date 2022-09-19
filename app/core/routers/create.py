@@ -47,10 +47,3 @@ async def handle_create(request: Request, auth_user= Depends(get_current_user)):
 
         
         return response
-        '''if await db_manager.create_user(form):
-            return responses.RedirectResponse(
-                "/?msg=Successfully-Registered", status_code=status.HTTP_302_FOUND
-            )  # default is post request, to use get request added status code 302
-        else:
-            form.__dict__.get("errors").append("Duplicate username or email")
-            return templates.TemplateResponse("manage/register.html", form.__dict__)'''

@@ -191,6 +191,12 @@ a.article:hover {
     right: 0;
 }
 
+.fixedclear:after{
+    content:'';
+    display: block;
+    clear:both;
+}
+
 body {
     min-height: 100vh;
     position: relative;
@@ -217,7 +223,19 @@ footer {
     margin-right: auto;
 }
 
-a-scene {
-    height: 300px;
-    width: 600px;
+.main {
+    -ms-flex-direction: column;
+        flex-direction: column;
+    -ms-flex-pack: justify;
+        justify-content: space-between;
   }
+  .example__iframe {
+    height: 100%;
+  }
+  .content--body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    top: 0;
+    right: 0;
+  }    
