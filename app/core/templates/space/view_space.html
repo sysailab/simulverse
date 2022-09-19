@@ -1,0 +1,59 @@
+
+{% extends "base.html" %}
+
+{% block title %}Simulverse Management System{% endblock %}
+{% block head %}
+{{ super() }}
+
+{% endblock %}
+
+{% block page_content %}
+{% include 'include/sidebar.html' %}
+
+{% with msg=msg %}
+    {% include "include/alerts.html" %}
+{% endwith %}
+
+<main role="main" class="container">
+  <div class="jumbotron">
+    {{data.text|safe}}
+  </div>
+  {% if login is sameas true%}
+    {% for k, jumbo in data.scenes.items() %}
+      <div class="jumbotron">
+          <!-- Scene name-->
+          <p>{{jumbo}}</p><a class="btn btn-sm btn-primary" href="/space/scence/{{k}}" role="button">view »</a>
+          
+          {% if data.role == 'Editor' %}
+          <a class="btn btn-sm btn-primary" href="/space/edit/{{k}}"
+              role="button">Update Scene »</a>
+          <a class="btn btn-sm btn-danger" href="/space/delete/{{k}}"
+              role="button">Delete Scene »</a>
+          {% else %}
+          <a class="btn btn-sm btn-secondary" role="button"> Update Space »</a>
+          <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
+          {% endif %}
+      </div>
+      <p></p>
+  {% endfor %}
+{% endif %}
+    {% if data.role == 'Editor' %}
+            <a class="btn btn-sm btn-primary" href="/space/insert/{{data.space_id}}"
+                role="button">Insert Scene »</a>
+            <a class="btn btn-sm btn-danger" href="/space/delete/{{data.space_id}}"
+                role="button">Delete Space »</a>
+        {% else %}
+            <a class="btn btn-sm btn-secondary" href="/space/insert/{{data.space_id}}"
+                role="button">Insert Scene »</a>
+            <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
+        {% endif %}
+</main><!-- /.container -->
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+
+{% endblock %}

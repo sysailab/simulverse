@@ -17,7 +17,7 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 @router.get("/register/")
 def render_register(request: Request):
-    return templates.TemplateResponse("manage/register.html", {"request": request})
+    return templates.TemplateResponse("auth/register.html", {"request": request})
 
 @router.post("/register/")
 async def handle_register(request: Request):
@@ -30,6 +30,6 @@ async def handle_register(request: Request):
             )  # default is post request, to use get request added status code 302
         else:
             form.__dict__.get("errors").append("Duplicate username or email")
-            return templates.TemplateResponse("manage/register.html", form.__dict__)
+            return templates.TemplateResponse("auth/register.html", form.__dict__)
             
-    return templates.TemplateResponse("manage/register.html", form.__dict__)
+    return templates.TemplateResponse("auth/register.html", form.__dict__)
