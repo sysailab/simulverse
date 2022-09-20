@@ -32,7 +32,7 @@ def test_setup_db():
         document = jsonable_encoder(user)
         result = await db_manager.get_collection('users').insert_one(document)
          
-        result = await db_manager.get_user('cbchoi')
+        result = await db_manager.get_user_by_email('cbchoi')
         assert result.userid == user.userid
 
     loop = db_manager.client.get_io_loop()

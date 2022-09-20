@@ -25,8 +25,16 @@ class db_manager(object):
         return cls.db[name]
 
     @classmethod
-    async def get_user(cls, email: str) -> UserInDB|None:
+    async def get_user_by_email(cls, email: str) -> UserInDB|None:
         document = await cls.get_collection("users").find_one({'email': email})
+        if document:
+            return UserInDB(**document)
+        else:
+            return None
+    
+    @classmethod
+    async def get_user_by_id(cls, userid:ObjectId) -> UserInDB|None:
+        document = await cls.get_collection("users").find_one({'_id': userid})
         if document:
             return UserInDB(**document)
         else:
@@ -34,7 +42,7 @@ class db_manager(object):
 
     @classmethod
     async def authenticate_user(cls, userid: str, password: str):
-        user = await cls.get_user(userid)
+        user = await cls.get_user_by_email(userid)
         if not user:
             return False
         if not verify_password(password, user.hashed_password):
@@ -43,7 +51,7 @@ class db_manager(object):
 
     @classmethod
     async def create_user(cls, user:UserRegisterForm):
-        userdata = await cls.get_user(user.email)
+        userdata = await cls.get_user_by_email(user.email)
         if userdata:
             return False
         else:
@@ -53,10 +61,10 @@ class db_manager(object):
 
     @classmethod
     async def create_space(cls, creator: str, space:CreateSpaceForm):
-        userdata = await cls.get_user(creator)
+        userdata = await cls.get_user_by_email(creator)
         viewers = {str(userdata.id):'Editor'}
         for _id, role in zip(space.form_data['username'], space.form_data['role']):
-            view = await cls.get_user(_id)
+            view = await cls.get_user_by_email(_id)
             if view :
                 viewers[str(view.id)] = role
 
@@ -66,6 +74,31 @@ class db_manager(object):
 
         for viewer, val in viewers.items():
             await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id.inserted_id): val}}}]) 
+
+    @classmethod
+    async def update_space(cls, creator: UserInDB, space_id:ObjectId, space:CreateSpaceForm):
+        viewers = {str(creator.id):'Editor'}
+        for _id, role in zip(space.form_data['username'], space.form_data['role']):
+            view = await cls.get_user_by_email(_id)
+            if view :
+                viewers[str(view.id)] = role
+        print("viewers", viewers)
+        
+        print('deletion')
+        found_space = await db_manager.get_collection('spaces').find_one({'_id':space_id})
+        for viewer, val in found_space['viewers'].items():
+            if viewer not in viewers:
+                print(viewer, val)
+                await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, {"$unset": {f'spaces.{str(space_id)}': ""}}) 
+            else:
+                await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id): val}}}])
+
+        print('deletion')
+
+        data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 'viewers':viewers}
+        print('space update', data)
+        await db_manager.get_collection('spaces').update_one({'_id':space_id}, {"$unset": {f'viewers': ""}})
+        await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{'$set':data}]) 
     
     @classmethod
     async def create_scene(cls, form:CreateSceneForm, space_id:ObjectId ):
