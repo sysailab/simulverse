@@ -10,7 +10,8 @@ from bson.objectid import ObjectId
 from ..models.database import db_manager
 from ..instance import config
 from ..models.auth_manager import get_current_user
-from ..schemas.space_model import CreateSceneForm, SpaceModel
+from ..schemas.space_model import CreateSceneForm, CreateSpaceForm
+
 
 
 router = APIRouter(include_in_schema=False)
@@ -100,4 +101,9 @@ async def handle_update_space(request: Request, space_id:str, auth_user= Depends
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
+        form = CreateSpaceForm(request)
+        await form.load_data()
+
+        await db_manager.update_space(auth_user, ObjectId(space_id), form)
+        
         return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})
