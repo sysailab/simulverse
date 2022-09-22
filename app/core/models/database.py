@@ -3,12 +3,11 @@ import motor.motor_asyncio
 from bson.objectid import ObjectId
 from fastapi import Request
 
-from ..libs.pyobjectid import PyObjectId
 from ..libs.utils import verify_password
 from ..libs.utils import get_password_hash
 
 from ..schemas.user_model import UserRegisterForm, UserInDB
-from ..schemas.space_model import CreateSpaceForm, SpaceModel, CreateSceneForm
+from ..schemas.space_model import CreateSpaceForm, SpaceModel, CreateSceneForm, UpdateSceneForm
 
 
 class db_manager(object):
@@ -108,24 +107,49 @@ class db_manager(object):
         '''
         link: link_name, scene_id, x, y, z
         '''
-
-        data = {'name':form.form_data['scene_name'][0], 'image_id':image_id, 'links':{}}
+        links = []
+        if 'scene' in form.form_data:
+            links = list(zip(form.scene[1:], form.x[1:],form.y[1:], form.z[1:]))
+        data = {'name':form.scene_name, 'image_id':image_id, 'links':links}
         scene_id = await db_manager.get_collection('scenes').insert_one(data)
-        await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.form_data['scene_name'][0]}}}]) 
+        await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.scene_name}}}]) 
+
+    @classmethod
+    async def update_scene(cls, form:UpdateSceneForm, space_id:ObjectId, scene_id:ObjectId ):
+        '''
+        link: link_name, scene_id, x, y, z
+        '''
+        links = []
+        if 'scene' in form.form_data:
+            links = list(zip(form.scene, form.x,form.y, form.z))
+
+        data = {'name':form.scene_name, 'links':links}
+        print(data)
+        await db_manager.get_collection('scenes').update_one({'_id':scene_id},{"$unset": {f'links': []}})
+        await db_manager.get_collection('scenes').update_one({'_id':scene_id},[{"$set": data}])
+        await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{"$set": {'scenes': {str(scene_id): form.scene_name}}}]) 
 
     @classmethod
     async def get_scene(cls, scene_id:ObjectId ):
-        print("!", scene_id)
         scene = await db_manager.get_collection('scenes').find_one({"_id":scene_id})
         return scene
-            
+
+    @classmethod
+    async def get_scenes_from_space(cls, spaceid: ObjectId):
+        scenes = []
+        cursor = await cls.get_collection("spaces").find_one({"_id":spaceid})
+        for sceneid, scene_name in cursor["scenes"].items():
+            scenes.append((sceneid, scene_name))
+        
+        return scenes
+
     @classmethod
     async def get_spaces(cls, creator: UserInDB):
         spaces = []
         for spaceid, role in creator.spaces.items():
             cursor = await cls.get_collection("spaces").find_one({"_id":ObjectId(spaceid)})
             spaces.append((cursor["name"], cursor['explain'], spaceid, role))
-        
+
         return spaces
 
     @classmethod

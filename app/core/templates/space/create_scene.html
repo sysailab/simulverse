@@ -87,20 +87,48 @@
           <a class="btn btn-primary btn-sm" id="addItemBtn" onclick="addField()"> Add Link</a>
           <div class="row" id="listItem" hidden="true">            
             <div class ="col" style="float: left;">
-                <label> Scene Link </label>
-                </div>
-              <div class ="col">
-                <!-- select user access  -->
-                <select
-                  class="form-control"
-                  name="link"
-                  id="access"
-                >
-                  <option value="Viewer" selected="true" id="select-editor">
-                    Viewer
-                  </option>
-                </select>
-              </div>
+                Scene: <select
+                      name="scene"
+                      id="access"
+                    >
+                    {% for val, scene in data.scenes %}
+                      <option value="{{val}}" id="select-editor">
+                        {{scene}}
+                      </option>
+                    {% endfor %}
+                    </select>
+            </div>
+            <div class ="col">
+              <!-- select user access  -->
+              x:  <input
+                id="x"
+                placeholder="x coordinate"
+                name="x"
+                size="5px"
+                value="0"
+              />    
+            </div>
+            <div class ="col">
+              <!-- select user access  -->
+              y:  <input
+                id="y"
+                placeholder="y coordinate"
+                name="y"
+                size="5px"
+                value="0"
+              />    
+            </div>
+
+            <div class ="col">
+              <!-- select user access  -->
+              z:  <input
+                id="z"
+                placeholder="z coordinate"
+                name="z"
+                size="5px"
+                value="0"
+              />    
+            </div>
 
             <div class="col" id="div_del">
               <button
