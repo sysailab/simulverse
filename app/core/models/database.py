@@ -120,14 +120,20 @@ class db_manager(object):
         link: link_name, scene_id, x, y, z
         '''
         links = []
-        if 'scene' in form.form_data:
-            links = list(zip(form.scene, form.x,form.y, form.z))
+        if type(form.scene) is list:
+            # get scene nam
+            scene_id_lst = []
+            for _id in form.scene:
+                scene = await db_manager.get_scene(ObjectId(_id))
+                scene_id_lst.append(scene["name"])
 
-        data = {'name':form.scene_name, 'links':links}
-        print(data)
-        await db_manager.get_collection('scenes').update_one({'_id':scene_id},{"$unset": {f'links': []}})
-        await db_manager.get_collection('scenes').update_one({'_id':scene_id},[{"$set": data}])
-        await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{"$set": {'scenes': {str(scene_id): form.scene_name}}}]) 
+            links = list(zip(scene_id_lst, form.scene, form.x, form.y, form.z))
+
+            data = {'name':form.scene_name, 'links':links}
+            await db_manager.get_collection('scenes').update_one({'_id':scene_id},{"$unset": {f'links': []}})
+            await db_manager.get_collection('scenes').update_one({'_id':scene_id},[{"$set": data}])
+
+        result = await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{"$set": {'scenes': {str(scene_id): form.scene_name}}}]) 
 
     @classmethod
     async def get_scene(cls, scene_id:ObjectId ):

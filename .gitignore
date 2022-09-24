@@ -131,5 +131,5 @@ dmypy.json
 # cbchoi - ignore testing script
 instance_test*
 
-#jayun9816 - ignore .DS_Store
+# ignore .DS_Store
 .DS_Store

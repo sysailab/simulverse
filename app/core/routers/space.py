@@ -80,8 +80,8 @@ async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_u
         return response
     else:
         scene = await db_manager.get_scene(ObjectId(scene_id))
-        print(scene)
-        data = {'background':scene['image_id']}
+        print("scene view", scene)
+        data = {'background':scene['image_id'], 'links':scene["links"]}
         return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data, "login":True})
 
 @router.get("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -94,7 +94,7 @@ async def scene_edit(request: Request, scene_id:str, space_id:str, auth_user= De
         scenes = await db_manager.get_scenes_from_space(ObjectId(space_id))
         
         data = {'name': scene['name'], 'image_id':scene['image_id'], "scenes":scenes, "links":scene['links']}
-        print(data)
+        print("scene edit", data)
         return templates.TemplateResponse("space/update_scene.html", {"request": request, "data": data, "login":True})
 
 @router.post("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -107,7 +107,7 @@ async def handle_scene_edit(request: Request, scene_id:str, space_id:str, auth_u
         await form.load_data()
         
         if await form.is_valid():
-            await db_manager.update_scene(form, ObjectId(space_id), ObjectId(scene_id))
+            await db_manager.update_scene(form, space_id=ObjectId(space_id), scene_id=ObjectId(scene_id))
 
             response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
             return response
