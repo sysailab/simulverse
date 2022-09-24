@@ -119,7 +119,7 @@
                 >
                 
                 {% for val, scene in data.scenes %}
-                  {% if val == link[0] %}
+                  {% if val == link[1] %}
                     <option value="{{val}}" id="select-editor" name="link" selected>
                       {{scene}} 
                     </option>
@@ -138,7 +138,7 @@
             placeholder="x coordinate"
             name="x"
             size="5px"
-            value="{{link[1]}}"
+            value="{{link[2]}}"
           />    
          </div>
          <div class ="col">
@@ -148,7 +148,7 @@
             placeholder="y coordinate"
             name="y"
             size="5px"
-            value="{{link[2]}}"
+            value="{{link[3]}}"
           />    
          </div>
 
@@ -159,7 +159,7 @@
             placeholder="z coordinate"
             name="z"
             size="5px"
-            value="{{link[3]}}"
+            value="{{link[4]}}"
           />    
          </div>
 

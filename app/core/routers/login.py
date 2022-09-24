@@ -39,7 +39,7 @@ async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = 
         form_data.__dict__.update(request=request)
         form_data.__dict__.update(data={})
         response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-        response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
+        response.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True, secure=True, samesite="lax")
         return response
 
     else:
