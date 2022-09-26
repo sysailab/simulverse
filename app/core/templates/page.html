@@ -21,8 +21,11 @@
 </script>
 {% endblock %}
 
+{% block top_nav %}
+    {% include 'include/topnav.html' %}
+{%  endblock %}
+
 {% block page_content %}
-{% include 'include/sidebar.html' %}
 
 {% with msg=msg %}
     {% include "include/alerts.html" %}
