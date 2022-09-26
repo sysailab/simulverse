@@ -16,7 +16,7 @@ from .core.models.auth_manager import auth_manager
 from .core.schemas.token_model import Token
 from .core.instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
 
-from app.core.routers import register, page_tmp, login, create, space, asset
+from app.core.routers import page_view, register, login, create, space, asset
 
 BASE_DIR = dirname(abspath(__file__))
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'core/templates')))
@@ -26,7 +26,7 @@ app.mount("/static", StaticFiles(directory=str(Path(BASE_DIR, 'static'))), name=
 db_manager.init_manager(MONGODB_URL, "simulverse")
 
 app.include_router(register.router, prefix="", tags=["register"])
-app.include_router(page_tmp.router, prefix="", tags=["home"])
+app.include_router(page_view.router, prefix="", tags=["home"])
 app.include_router(login.router, prefix="", tags=["login"])
 app.include_router(create.router, prefix="", tags=["create"])
 app.include_router(space.router, prefix="", tags=["space"])
@@ -49,6 +49,5 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 @app.exception_handler(HTTPException)
 async def unicorn_exception_handler(request: Request, exc: HTTPException):
-    print("@@##")
     response = RedirectResponse("/login/?errors=401", status_code=status.HTTP_302_FOUND)
     return response
