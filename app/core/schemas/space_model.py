@@ -58,10 +58,15 @@ class CreateSceneForm:
             else:
                 setattr(self, key, val[0])
 
+        self.scene = self.scene[1:]
+        self.x = self.x[1:]
+        self.y = self.y[1:]
+        self.z = self.z[1:]
+
     async def is_valid(self):
-        if not self.name:
+        if not self.scene_name:
             self.errors.append("Name is required")
-        if not self.image_id:
+        if not self.file:
             self.errors.append("Image File is required")
         if not self.errors:
             return True
@@ -86,9 +91,14 @@ class UpdateSceneForm:
         for key, val in self.form_data.items():
             print(key, val)
             if len(val) > 1:
-                setattr(self, key, val[1:])
+                setattr(self, key, val)
             else:
                 setattr(self, key, val[0])
+
+        self.scene = self.scene[1:]
+        self.x = self.x[1:]
+        self.y = self.y[1:]
+        self.z = self.z[1:]
 
     async def is_valid(self):
         if not self.scene_name:

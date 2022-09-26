@@ -107,31 +107,60 @@ class db_manager(object):
         '''
         link: link_name, scene_id, x, y, z
         '''
-        links = []
-        if 'scene' in form.form_data:
-            links = list(zip(form.scene[1:], form.x[1:],form.y[1:], form.z[1:]))
-        data = {'name':form.scene_name, 'image_id':image_id, 'links':links}
+        proc_links = list(zip(form.scene, form.x, form.y, form.z))
+
+        check_list = []
+        for plink in proc_links:
+            target_id, link_id = plink[0].split(".")
+            check_list.append(link_id)
+            data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
+            res = await db_manager.get_collection('links').insert_one(data)
+
+        data = {'name':form.scene_name, 'image_id':image_id, 'links':check_list}
         scene_id = await db_manager.get_collection('scenes').insert_one(data)
         await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.scene_name}}}]) 
+
+    async def create_link(cls, data:dict):
+        link_id = await db_manager.get_collection('links').insert_one(data)
+        return link_id
 
     @classmethod
     async def update_scene(cls, form:UpdateSceneForm, space_id:ObjectId, scene_id:ObjectId ):
         '''
         link: link_name, scene_id, x, y, z
         '''
-        links = []
-        if type(form.scene) is list:
-            # get scene nam
-            scene_id_lst = []
-            for _id in form.scene:
-                scene = await db_manager.get_scene(ObjectId(_id))
-                scene_id_lst.append(scene["name"])
+        # insert new link
+        # update prev_link
 
-            links = list(zip(scene_id_lst, form.scene, form.x, form.y, form.z))
+        prev_scene = await db_manager.get_collection('scenes').find_one(scene_id)
+        proc_links = list(zip(form.scene, form.x, form.y, form.z))
 
-            data = {'name':form.scene_name, 'links':links}
-            await db_manager.get_collection('scenes').update_one({'_id':scene_id},{"$unset": {f'links': []}})
-            await db_manager.get_collection('scenes').update_one({'_id':scene_id},[{"$set": data}])
+
+        prev_links = prev_scene['links']
+
+        check_list = []
+        for plink in proc_links:
+            target_id, link_id = plink[0].split(".")
+            print(target_id, f"!!{link_id}!!")
+            print(type(target_id), type(link_id))
+
+            if link_id != "":
+                if ObjectId(link_id) in prev_links:
+                    prev_links.remove(ObjectId(link_id))
+                data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
+                await db_manager.get_collection('links').update_one({'_id':ObjectId(link_id)}, {'$set':data})
+            else:
+                if target_id != "":
+                    data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
+                    res = await db_manager.get_collection('links').insert_one(data)
+                    await db_manager.get_collection('scenes').update_one({'_id':ObjectId(scene_id)}, {'$push':{'links':ObjectId(res.inserted_id)}})
+
+        for link in prev_links:
+            print('remove', link)
+            await db_manager.get_collection('scenes').update_one({'_id':ObjectId(scene_id)}, {'$pull':{'links':ObjectId(link)}})
+
+        data = {'name':form.scene_name, 'links':check_list}
+        #scene_id = await db_manager.get_collection('scenes').insert_one(data)
 
         result = await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{"$set": {'scenes': {str(scene_id): form.scene_name}}}]) 
 
@@ -141,7 +170,12 @@ class db_manager(object):
         return scene
 
     @classmethod
-    async def get_scenes_from_space(cls, spaceid: ObjectId):
+    async def get_link(cls, link_id:ObjectId ):
+        link = await db_manager.get_collection('links').find_one({"_id":link_id})
+        return link
+    
+    @classmethod
+    async def get_scenes(cls, spaceid: ObjectId):
         scenes = []
         cursor = await cls.get_collection("spaces").find_one({"_id":spaceid})
         for sceneid, scene_name in cursor["scenes"].items():
@@ -157,6 +191,15 @@ class db_manager(object):
             spaces.append((cursor["name"], cursor['explain'], spaceid, role))
 
         return spaces
+    
+    @classmethod
+    async def get_scenes_from_space(cls, spaceid: ObjectId):
+        scenes = []
+        cursor = await cls.get_collection("spaces").find_one({"_id":spaceid})
+        for sceneid, scene_name in cursor["scenes"].items():
+            scenes.append((sceneid, scene_name))
+        
+        return scenes
 
     @classmethod
     async def get_space(cls, space_id: ObjectId):
@@ -177,3 +220,13 @@ class db_manager(object):
 
         return (content, gridout.content_type)
         
+    @classmethod
+    async def delete_scene(cls, space_id:ObjectId, scene_id:ObjectId):
+        print("del scene", scene_id, type(scene_id))
+        await db_manager.get_collection('scenes').delete_one({'_id':scene_id})
+        d = await db_manager.get_collection('links').delete_many({'target_id':scene_id})
+        res = db_manager.get_collection('links').find({})
+        for document in await res.to_list(length=100):
+            print(document)
+
+        await db_manager.get_collection('spaces').update_one({'_id':space_id}, {'$unset':{f"scenes.{str(scene_id)}":""}})

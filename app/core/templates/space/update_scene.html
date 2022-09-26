@@ -58,10 +58,12 @@
             <div class ="col" style="float: left;">
               Scene: <select
                     name="scene"
-                    id="access"
-                  >
+                    id="access">
+                  <option value="." id="select-editor" selected>
+                    ---
+                  </option>
                   {% for val, scene in data.scenes %}
-                    <option value="{{val}}" id="select-editor" name="link">
+                    <option value="{{val}}." id="select-editor" name="link">
                       {{scene}}
                     </option>
                   {% endfor %}
@@ -84,7 +86,7 @@
               placeholder="y coordinate"
               name="y"
               size="5px"
-              value="0"
+              value="1"
             />    
           </div>
 
@@ -95,7 +97,7 @@
               placeholder="z coordinate"
               name="z"
               size="5px"
-              value="0"
+              value="-6"
             />    
           </div>
 
@@ -119,12 +121,12 @@
                 >
                 
                 {% for val, scene in data.scenes %}
-                  {% if val == link[1] %}
-                    <option value="{{val}}" id="select-editor" name="link" selected>
+                  {% if val == link.target_id|string() %}
+                    <option value="{{val}}.{{link._id}}" id="select-editor" name="link" selected>
                       {{scene}} 
                     </option>
                   {% else %}
-                    <option value="{{val}}" id="select-editor" name="link">
+                    <option value="{{val}}.{{link._id}}" id="select-editor" name="link">
                       {{scene}} 
                     </option>
                   {% endif %}
@@ -138,7 +140,7 @@
             placeholder="x coordinate"
             name="x"
             size="5px"
-            value="{{link[2]}}"
+            value="{{link.x}}"
           />    
          </div>
          <div class ="col">
@@ -148,7 +150,7 @@
             placeholder="y coordinate"
             name="y"
             size="5px"
-            value="{{link[3]}}"
+            value="{{link.y}}"
           />    
          </div>
 
@@ -159,7 +161,7 @@
             placeholder="z coordinate"
             name="z"
             size="5px"
-            value="{{link[4]}}"
+            value="{{link.z}}"
           />    
          </div>
 
@@ -168,6 +170,7 @@
               class="btn btn-danger btn-sm"
               border:none
               id="delbutton"
+              onclick="removeField('listItem{{loop.index}}')"
             >
               Remove Link
             </button>

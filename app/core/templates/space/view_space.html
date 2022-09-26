@@ -5,6 +5,35 @@
 {% block head %}
 {{ super() }}
 
+<script type="text/javascript">
+function del_scene(space_id, scene_id) {
+    var url = '/space/delete/scene/' + space_id +'/' + scene_id
+
+    $.ajax({
+            type: "POST",
+            url: url,
+            data: space_id,
+            success: function () {
+                location.reload();
+            },
+        });
+
+}
+
+function del_space(space_id) {
+    var url = '/space/delete/space/' + space_id
+
+    $.ajax({
+            type: "POST",
+            url: url,
+            data: space_id,
+            success: function () {
+                location.reload();
+            },
+        });
+}
+</script>
+
 {% endblock %}
 
 {% block page_content %}
@@ -27,8 +56,8 @@
           {% if data.role == 'Editor' %}
           <a class="btn btn-sm btn-primary" href="/space/scene/edit/{{data.space_id}}/{{k}}/"
               role="button">Update Scene »</a>
-          <a class="btn btn-sm btn-danger" href="/space/delete/{{k}}"
-              role="button">Delete Scene »</a>
+          <a class="btn btn-sm btn-danger"
+              role="button" onclick="del_scene('{{data.space_id}}', '{{k}}')">Delete Scene »</a>
           {% else %}
           <a class="btn btn-sm btn-secondary" role="button"> Update Scene »</a>
           <a class="btn btn-sm btn-secondary" role="button"> Delete Scene »</a>
@@ -40,11 +69,10 @@
     {% if data.role == 'Editor' %}
             <a class="btn btn-sm btn-primary" href="/space/insert/{{data.space_id}}"
                 role="button">Insert Scene »</a>
-            <a class="btn btn-sm btn-danger" href="/space/delete/{{data.space_id}}"
-                role="button">Delete Space »</a>
+            <a class="btn btn-sm btn-danger" 
+                role="button" onclick="del_space('{{data.space_id}}')">Delete Space »</a>
         {% else %}
-            <a class="btn btn-sm btn-secondary" href="/space/insert/{{data.space_id}}"
-                role="button">Insert Scene »</a>
+            <a class="btn btn-sm btn-secondary" role="button">Insert Scene »</a>
             <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
         {% endif %}
 </main><!-- /.container -->

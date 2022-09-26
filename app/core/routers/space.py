@@ -61,7 +61,7 @@ async def handle_insert_scene(request: Request, space_id:str, auth_user= Depends
     else:
         form = CreateSceneForm(request)
         await form.load_data()
-        if form.is_valid():
+        if await form.is_valid():
             await db_manager.create_scene(form, ObjectId(space_id))
 
             response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
@@ -81,7 +81,17 @@ async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_u
     else:
         scene = await db_manager.get_scene(ObjectId(scene_id))
         print("scene view", scene)
-        data = {'background':scene['image_id'], 'links':scene["links"]}
+        links = []
+        for link in scene["links"]:
+            target_link = await db_manager.get_collection("links").find_one({'_id':link})
+            target_name = await db_manager.get_scene(target_link['target_id'])
+            
+            links.append([target_name['name'], target_link['target_id']
+                                             , target_link['x']
+                                             , target_link['y']
+                                             , target_link['z']])
+
+        data = {'background':scene['image_id'], 'links':links}
         return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data, "login":True})
 
 @router.get("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -90,10 +100,20 @@ async def scene_edit(request: Request, scene_id:str, space_id:str, auth_user= De
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
+        '''
+        {'_id': ObjectId('632f2186b763ee36b2407771'), 'target_id':ObjectId('632f21a1b763ee36b2407785'), 'x':'0', 'y':'1', 'z':'-6'}
+        '''
+
         scene = await db_manager.get_scene(ObjectId(scene_id))
+
         scenes = await db_manager.get_scenes_from_space(ObjectId(space_id))
         
-        data = {'name': scene['name'], 'image_id':scene['image_id'], "scenes":scenes, "links":scene['links']}
+        link_info = []
+        for l in scene["links"]:
+            link = await db_manager.get_link(l)
+            link_info.append(link)
+        
+        data = {'name': scene['name'], 'image_id':scene['image_id'], "scenes":scenes, "links":link_info}
         print("scene edit", data)
         return templates.TemplateResponse("space/update_scene.html", {"request": request, "data": data, "login":True})
 
@@ -146,3 +166,34 @@ async def handle_update_space(request: Request, space_id:str, auth_user= Depends
         await db_manager.update_space(auth_user, ObjectId(space_id), form)
         
         return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})
+
+@router.post("/space/delete/scene/{space_id}/{scene_id}", response_class=HTMLResponse)
+async def handle_delete_scene(request: Request, space_id:str, scene_id:str, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        return response
+    else:
+        print(space_id, scene_id)
+        # delete scene
+        await db_manager.delete_scene(ObjectId(space_id), ObjectId(scene_id))
+
+        response = RedirectResponse(f"/view/", status_code=status.HTTP_302_FOUND)
+        return response
+
+
+@router.post("/space/delete/space/{space_id}")
+async def handle_delete_space(request: Request, space_id:str, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        return response
+    else:
+        # delete scene
+        result = await db_manager.get_collection('spaces').find_one({'_id':ObjectId(space_id)})
+        for scene in result['scenes']:
+            await db_manager.delete_scene(ObjectId(space_id), ObjectId(scene))
+
+        await db_manager.get_collection('spaces').delete_one({'_id':ObjectId(space_id)})
+        await db_manager.get_collection('users').update_many({}, {'$unset':{f"spaces.{str(space_id)}":""}})
+        
+        response = RedirectResponse(f"/", status_code=status.HTTP_302_FOUND)
+        return response
