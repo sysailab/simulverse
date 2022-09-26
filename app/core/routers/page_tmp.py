@@ -34,10 +34,6 @@ async def root(request: Request):
         
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True, "errors":errors})'''
 
-@router.get("/scene/{scene_id}", response_class=HTMLResponse)
-async def get_scene(request: Request, scene_id: int):
-    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: Scene{scene_id}.</p>'}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data})
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request, auth_user= Depends(get_current_user)):
@@ -53,14 +49,3 @@ async def view(request: Request, auth_user= Depends(get_current_user)):
             errors = [ resolve_error(x) for x in request.query_params['error'].split('.')]
         
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True, "errors":errors})
-
-@router.get("/vr/", response_class=HTMLResponse)
-async def vr(request: Request, auth_user= Depends(get_current_user)):
-    
-    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: View.</p>'}  
-    return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data})
-        
-#@router.get("/login/", response_class=HTMLResponse)
-#async def login(request: Request):
-#    data = {'text': f'<h1>Welcome to the Simulverse Management System </h1>\n<p>#TODO: authentication.</p>'}  
-#    return templates.TemplateResponse("page.html", {"request": request, "data": data})
