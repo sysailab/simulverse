@@ -46,7 +46,6 @@ class CreateSceneForm:
         contents = form.multi_items()
         
         for k, v in contents:
-            print(k,v)
             if k not in self.form_data:
                 self.form_data.setdefault(k, []).append(v)
             else:
@@ -89,7 +88,6 @@ class UpdateSceneForm:
                 self.form_data[k].append(v)
 
         for key, val in self.form_data.items():
-            print(key, val)
             if len(val) > 1:
                 setattr(self, key, val)
             else:

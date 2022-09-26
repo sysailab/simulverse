@@ -39,9 +39,9 @@ async def do_insert(db):
     await db['scenes'].insert_many(data)
 
     #db['links']
-    data = [{'_id': ObjectId('632f2186b763ee36b2407771'), 'target_id':ObjectId('632f21a1b763ee36b2407785'), 'x':'0', 'y':'1', 'z':'-6'}, 
-            {'_id': ObjectId('632f2186b763ee36b2407772'), 'target_id':ObjectId('632f21a1b763ee36b2407785'), 'x':'0', 'y':'1', 'z':'-6'},
-            {'_id': ObjectId('632f2186b763ee36b2407773'), 'target_id':ObjectId('632f2186b763ee36b240777b'), 'x':'0', 'y':'1', 'z':'-6'}]
+    data = [{'_id': ObjectId('632f2186b763ee36b2407771'), 'target_id':ObjectId('632f21a1b763ee36b2407785'), 'x':'0', 'y':'1', 'z':'-6', 'yaw':'0', 'pitch':"0", "roll":"0"}, 
+            {'_id': ObjectId('632f2186b763ee36b2407772'), 'target_id':ObjectId('632f21a1b763ee36b2407785'), 'x':'0', 'y':'1', 'z':'-6', 'yaw':'0', 'pitch':"0", "roll":"0"},
+            {'_id': ObjectId('632f2186b763ee36b2407773'), 'target_id':ObjectId('632f2186b763ee36b240777b'), 'x':'0', 'y':'1', 'z':'-6', 'yaw':'0', 'pitch':"0", "roll":"0"}]
     await db['links'].insert_many(data)
 
 client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URL)

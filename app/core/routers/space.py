@@ -1,10 +1,9 @@
 from fastapi.responses import HTMLResponse
 from os.path import dirname, abspath
 from pathlib import Path
-from fastapi import APIRouter, Depends, Request, responses, HTTPException, status
+from fastapi import APIRouter, Depends, Request, status
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
-from jose import JWTError, jwt
 from bson.objectid import ObjectId
 
 from ..models.database import db_manager
@@ -12,7 +11,7 @@ from ..instance import config
 from ..models.auth_manager import get_current_user
 from ..schemas.space_model import CreateSceneForm, CreateSpaceForm, UpdateSceneForm
 
-
+import json
 
 router = APIRouter(include_in_schema=False)
 
@@ -80,7 +79,6 @@ async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_u
         return response
     else:
         scene = await db_manager.get_scene(ObjectId(scene_id))
-        print("scene view", scene)
         links = []
         for link in scene["links"]:
             target_link = await db_manager.get_collection("links").find_one({'_id':link})
@@ -89,9 +87,13 @@ async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_u
             links.append([target_name['name'], target_link['target_id']
                                              , target_link['x']
                                              , target_link['y']
-                                             , target_link['z']])
+                                             , target_link['z']
+                                             , target_link['yaw']
+                                             , target_link['pitch']
+                                             , target_link['roll']
+                                             , target_link['_id']])
 
-        data = {'background':scene['image_id'], 'links':links}
+        data = {'scene_id':scene_id, 'background':scene['image_id'], 'links':links}
         return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data, "login":True})
 
 @router.get("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -114,7 +116,6 @@ async def scene_edit(request: Request, scene_id:str, space_id:str, auth_user= De
             link_info.append(link)
         
         data = {'name': scene['name'], 'image_id':scene['image_id'], "scenes":scenes, "links":link_info}
-        print("scene edit", data)
         return templates.TemplateResponse("space/update_scene.html", {"request": request, "data": data, "login":True})
 
 @router.post("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -173,7 +174,6 @@ async def handle_delete_scene(request: Request, space_id:str, scene_id:str, auth
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        print(space_id, scene_id)
         # delete scene
         await db_manager.delete_scene(ObjectId(space_id), ObjectId(scene_id))
 
@@ -197,3 +197,19 @@ async def handle_delete_space(request: Request, space_id:str, auth_user= Depends
         
         response = RedirectResponse(f"/", status_code=status.HTTP_302_FOUND)
         return response
+
+@router.put("/space/scene/link/update/{scene_id}")
+async def handle_link_update(request: Request, scene_id:str, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        return response
+    else:
+        # delete scene
+        #result = await db_manager.get_collection('scenes').find_one({'_id':ObjectId(scene_id)})
+        _body = await request.body()
+        _body = result = json.loads(_body.decode('utf-8'))
+        for key, val in _body.items():
+            data = {'x':val[0]["x"], 'y':val[0]["y"], 'z':val[0]["z"], 'yaw':val[1]["x"], 'pitch':val[1]["y"], "roll":val[1]["z"]}
+            link = await db_manager.get_collection('links').update_one({'_id':ObjectId(key)}, {'$set':data})
+        
+        return 'done'
