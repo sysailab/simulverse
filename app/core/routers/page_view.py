@@ -22,18 +22,6 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 async def root(request: Request):
     data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
     return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
-    '''if not auth_user :
-        
-    else:
-        spaces = await db_manager.get_spaces(auth_user)
-        data = {'text':'<h1>Welcome to the Simulverse Management System </h1>', 'spaces':spaces} 
-        
-        errors = []
-        if 'error' in request.query_params:
-            errors = [ resolve_error(x) for x in request.query_params['error'].split('.')]
-        
-        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True, "errors":errors})'''
-
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request, auth_user= Depends(get_current_user)):

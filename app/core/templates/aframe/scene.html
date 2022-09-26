@@ -9,6 +9,7 @@
 <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
 <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
 <script src="{{ url_for('static', path='/scripts/link-controls.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', path='/scripts/contents-save.js') }}" crossorigin="anonymous"></script>
 
 {% endblock %} 
 
@@ -43,8 +44,12 @@
     
       Camera + Cursor. -->
       {% for link in data.links%}
-      <a-link class="clickable" title="{{link[0]}}" href="/space/scene/{{link[1]}}" position="{{link[2]}} {{link[3]}} {{link[4]}}"></a-link>
+      <a-link class="clickable" title="{{link[0]}}" href="/space/scene/{{link[1]}}" origin="{{link[8]}}"
+              position="{{link[2]}} {{link[3]}} {{link[4]}}" rotation="{{link[5]}} {{link[6]}} {{link[7]}}"></a-link>
       {% endfor%}
+
+      <a-box class="clickable" contents-save="scene_id:{{data.scene_id}}" height="0.5" width="0.5" position="0 -2 -2" color="red"></a-box>
+
       <a-camera>
         <a-cursor
           id="cursor"

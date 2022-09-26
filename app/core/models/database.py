@@ -81,21 +81,16 @@ class db_manager(object):
             view = await cls.get_user_by_email(_id)
             if view :
                 viewers[str(view.id)] = role
-        print("viewers", viewers)
-        
-        print('deletion')
+
         found_space = await db_manager.get_collection('spaces').find_one({'_id':space_id})
         for viewer, val in found_space['viewers'].items():
             if viewer not in viewers:
-                print(viewer, val)
                 await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, {"$unset": {f'spaces.{str(space_id)}': ""}}) 
             else:
                 await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id): val}}}])
 
-        print('deletion')
-
         data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 'viewers':viewers}
-        print('space update', data)
+
         await db_manager.get_collection('spaces').update_one({'_id':space_id}, {"$unset": {f'viewers': ""}})
         await db_manager.get_collection('spaces').update_one({'_id':space_id}, [{'$set':data}]) 
     
@@ -141,8 +136,6 @@ class db_manager(object):
         check_list = []
         for plink in proc_links:
             target_id, link_id = plink[0].split(".")
-            print(target_id, f"!!{link_id}!!")
-            print(type(target_id), type(link_id))
 
             if link_id != "":
                 if ObjectId(link_id) in prev_links:
@@ -156,7 +149,6 @@ class db_manager(object):
                     await db_manager.get_collection('scenes').update_one({'_id':ObjectId(scene_id)}, {'$push':{'links':ObjectId(res.inserted_id)}})
 
         for link in prev_links:
-            print('remove', link)
             await db_manager.get_collection('scenes').update_one({'_id':ObjectId(scene_id)}, {'$pull':{'links':ObjectId(link)}})
 
         data = {'name':form.scene_name, 'links':check_list}
@@ -222,11 +214,8 @@ class db_manager(object):
         
     @classmethod
     async def delete_scene(cls, space_id:ObjectId, scene_id:ObjectId):
-        print("del scene", scene_id, type(scene_id))
         await db_manager.get_collection('scenes').delete_one({'_id':scene_id})
         d = await db_manager.get_collection('links').delete_many({'target_id':scene_id})
         res = db_manager.get_collection('links').find({})
-        for document in await res.to_list(length=100):
-            print(document)
 
         await db_manager.get_collection('spaces').update_one({'_id':space_id}, {'$unset':{f"scenes.{str(scene_id)}":""}})
