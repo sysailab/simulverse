@@ -12,8 +12,9 @@ if __name__ == '__main__':
             uvicorn.run("app.main:app",
                   host="0.0.0.0",
                   port=19612,
-                  reload=True,
+                  reload=False,
                   ssl_keyfile= '/home/cbchoi/ssl/cbchoi.info.key',
                   ssl_certfile= '/home/cbchoi/ssl/cbchoi.info.cer',
+                  workers=4
                   )
                   
