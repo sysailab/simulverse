@@ -2,13 +2,11 @@ from fastapi import Request
 from pydantic import BaseModel, Field
 from bson import ObjectId
 
-from ..libs.pyobjectid import PyObjectId
-
 class SpaceModel(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: ObjectId = Field(default_factory=ObjectId, alias="_id")
     name: str = ""
     explain: str = ""
-    creator: PyObjectId = Field(default_factory=PyObjectId)
+    creator: ObjectId = Field(default_factory=ObjectId)
     viewers: dict | None = None
     scenes: dict | None = None
     
@@ -53,7 +51,7 @@ class CreateSceneForm:
 
         for key, val in self.form_data.items():
             if len(val) > 1:
-                setattr(self, key, val[1:])
+                setattr(self, key, val)
             else:
                 setattr(self, key, val[0])
 

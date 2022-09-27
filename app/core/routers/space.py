@@ -180,7 +180,6 @@ async def handle_delete_scene(request: Request, space_id:str, scene_id:str, auth
         response = RedirectResponse(f"/view/", status_code=status.HTTP_302_FOUND)
         return response
 
-
 @router.post("/space/delete/space/{space_id}")
 async def handle_delete_space(request: Request, space_id:str, auth_user= Depends(get_current_user)):
     if not auth_user :
