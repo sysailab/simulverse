@@ -29,3 +29,69 @@
  ```python
 >$ python simulverse.py http
 ```
+
+# Project Structure
+```
+📦app
+ ┣ 📂core
+ ┃ ┣ 📂instance
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┗ 📜config.py
+ ┃ ┣ 📂libs
+ ┃ ┃ ┣ 📜oauth2_cookie.py
+ ┃ ┃ ┣ 📜pyobjectid.py
+ ┃ ┃ ┣ 📜resolve_error.py
+ ┃ ┃ ┗ 📜utils.py
+ ┃ ┣ 📂models
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┣ 📜auth_manager.py
+ ┃ ┃ ┗ 📜database.py
+ ┃ ┣ 📂routers
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┣ 📜asset.py
+ ┃ ┃ ┣ 📜create.py
+ ┃ ┃ ┣ 📜login.py
+ ┃ ┃ ┣ 📜page_view.py
+ ┃ ┃ ┣ 📜register.py
+ ┃ ┃ ┗ 📜space.py
+ ┃ ┣ 📂schemas
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┣ 📜space_model.py
+ ┃ ┃ ┣ 📜token_model.py
+ ┃ ┃ ┗ 📜user_model.py
+ ┃ ┣ 📂templates
+ ┃ ┃ ┣ 📂aframe
+ ┃ ┃ ┃ ┣ 📜scene.html
+ ┃ ┃ ┃ ┗ 📜view_scenes.html
+ ┃ ┃ ┣ 📂auth
+ ┃ ┃ ┃ ┣ 📜login.html
+ ┃ ┃ ┃ ┗ 📜register.html
+ ┃ ┃ ┣ 📂include
+ ┃ ┃ ┃ ┣ 📜alerts.html
+ ┃ ┃ ┃ ┣ 📜sidebar.html
+ ┃ ┃ ┃ ┣ 📜topnav-sidebar.html
+ ┃ ┃ ┃ ┗ 📜topnav.html
+ ┃ ┃ ┣ 📂space
+ ┃ ┃ ┃ ┣ 📜create_scene.html
+ ┃ ┃ ┃ ┣ 📜create_space.html
+ ┃ ┃ ┃ ┣ 📜update_scene.html
+ ┃ ┃ ┃ ┣ 📜update_space.html
+ ┃ ┃ ┃ ┗ 📜view_space.html
+ ┃ ┃ ┣ 📜__init__.py
+ ┃ ┃ ┣ 📜base.html
+ ┃ ┃ ┣ 📜error.html
+ ┃ ┃ ┗ 📜page.html
+ ┃ ┣ 📜__init__.py
+ ┃ ┗ 📜settings.py
+ ┣ 📂static
+ ┃ ┣ 📂css
+ ┃ ┃ ┗ 📜custom_style.css
+ ┃ ┣ 📂images
+ ┃ ┃ ┗ 📜favicon.png
+ ┃ ┗ 📂scripts
+ ┃ ┃ ┣ 📜contents-save.js
+ ┃ ┃ ┣ 📜dynamic_fields.js
+ ┃ ┃ ┗ 📜link-controls.js
+ ┣ 📜__init__.py
+ ┗ 📜main.py
+```
