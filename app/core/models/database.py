@@ -65,14 +65,18 @@ class db_manager(object):
         for _id, role in zip(space.form_data['username'], space.form_data['role']):
             view = await cls.get_user_by_email(_id)
             if view :
-                viewers[str(view.id)] = role
+                if userdata.id != view.id:
+                    viewers[str(view.id)] = role
 
         data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 
                 'creator': userdata.id, 'viewers':viewers, 'scenes':{}}
         space_id = await db_manager.get_collection('spaces').insert_one(data) 
 
         for viewer, val in viewers.items():
-            await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id.inserted_id): val}}}]) 
+            if creator != viewer:
+                await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id.inserted_id): val}}}]) 
+            else:
+                await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id.inserted_id): "Editor"}}}]) 
 
     @classmethod
     async def update_space(cls, creator: UserInDB, space_id:ObjectId, space:CreateSpaceForm):
@@ -80,7 +84,8 @@ class db_manager(object):
         for _id, role in zip(space.form_data['username'], space.form_data['role']):
             view = await cls.get_user_by_email(_id)
             if view :
-                viewers[str(view.id)] = role
+                if str(creator.id) != str(view.id):
+                    viewers[str(view.id)] = role
 
         found_space = await db_manager.get_collection('spaces').find_one({'_id':space_id})
         for viewer, val in found_space['viewers'].items():
@@ -102,14 +107,16 @@ class db_manager(object):
         '''
         link: link_name, scene_id, x, y, z
         '''
-        proc_links = list(zip(form.scene, form.x, form.y, form.z))
+        proc_links = list(zip(form.scene, form.x, form.y, form.z, form.yaw, form.pitch, form.roll))
 
         check_list = []
         for plink in proc_links:
-            target_id, link_id = plink[0].split(".")
-            check_list.append(link_id)
-            data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
-            res = await db_manager.get_collection('links').insert_one(data)
+            target_id, _ = plink[0].split(".")
+            
+            if target_id != "":
+                data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
+                res = await db_manager.get_collection('links').insert_one(data)
+                check_list.append(res.inserted_id)
 
         data = {'name':form.scene_name, 'image_id':image_id, 'links':check_list}
         scene_id = await db_manager.get_collection('scenes').insert_one(data)
@@ -128,8 +135,8 @@ class db_manager(object):
         # update prev_link
 
         prev_scene = await db_manager.get_collection('scenes').find_one(scene_id)
-        proc_links = list(zip(form.scene, form.x, form.y, form.z))
-
+        proc_links = list(zip(form.scene, form.x, form.y, form.z, form.yaw, form.pitch, form.roll))
+        print(proc_links)
 
         prev_links = prev_scene['links']
 
@@ -140,11 +147,12 @@ class db_manager(object):
             if link_id != "":
                 if ObjectId(link_id) in prev_links:
                     prev_links.remove(ObjectId(link_id))
-                data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
+                data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
+                print(data)
                 await db_manager.get_collection('links').update_one({'_id':ObjectId(link_id)}, {'$set':data})
             else:
                 if target_id != "":
-                    data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id)}
+                    data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
                     res = await db_manager.get_collection('links').insert_one(data)
                     await db_manager.get_collection('scenes').update_one({'_id':ObjectId(scene_id)}, {'$push':{'links':ObjectId(res.inserted_id)}})
 
@@ -177,10 +185,10 @@ class db_manager(object):
 
     @classmethod
     async def get_spaces(cls, creator: UserInDB):
-        spaces = []
+        spaces = {}
         for spaceid, role in creator.spaces.items():
             cursor = await cls.get_collection("spaces").find_one({"_id":ObjectId(spaceid)})
-            spaces.append((cursor["name"], cursor['explain'], spaceid, role))
+            spaces[spaceid] = [cursor["name"], cursor['explain'], role]
 
         return spaces
     

@@ -21,22 +21,23 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 @router.get("/", response_class=HTMLResponse)
 async def root(request: Request, auth_user= Depends(get_current_user)):
     if not auth_user :
-        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n', 'spaces':{}}  
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
     else:
-        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n', 'spaces':{}}  
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True})
     
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request, auth_user= Depends(get_current_user)):
     if not auth_user :
-        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n<p>Please Log-in or Sign-up.</p>'}  
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n<p>Please Log-in or Sign-up.</p>', 'spaces':{}}  
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
     else:
         spaces = await db_manager.get_spaces(auth_user)
         data = {'text':'<h1>Welcome to the Simulverse Management System </h1>', 'spaces':spaces} 
         
+        print(data)
         errors = []
         if 'error' in request.query_params:
             errors = [ resolve_error(x) for x in request.query_params['error'].split('.')]

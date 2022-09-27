@@ -2,14 +2,12 @@ from fastapi import Request
 from pydantic import BaseModel, Field
 from bson.objectid import ObjectId
 
-from ..libs.pyobjectid import PyObjectId
-
 class UserModel(BaseModel):
     userid: str  = ""
     email: str = ""
 
 class UserInDB(UserModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: ObjectId = Field(default_factory=ObjectId, alias="_id")
     hashed_password: str = ""
     spaces:dict = {}
     class Config:

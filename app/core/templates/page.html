@@ -46,18 +46,18 @@
         </div>
         
         {% if login is sameas true%}
-            {% for jumbo in data.spaces %}
+            {% for key, jumbo in data.spaces.items() %}
             <div class="jumbotron">
                 <!-- Region name-->
                 <h3>{{jumbo[0]}}</h3>
                 
-                <p>{{jumbo[1]}}</p><a class="btn btn-sm btn-primary" href="/space/view/{{jumbo[2]}}" role="button">Explore »</a>
+                <p>{{jumbo[1]}}</p><a class="btn btn-sm btn-primary" href="/space/view/{{key}}" role="button">Explore »</a>
                 
                 <p></p>
-                {% if jumbo[3] == 'Editor' %}
-                <a class="btn btn-sm btn-primary" href="/space/edit/{{jumbo[2]}}"
+                {% if jumbo[2] == 'Editor' %}
+                <a class="btn btn-sm btn-primary" href="/space/edit/{{key}}"
                     role="button">Update Space »</a>
-                <a class="btn btn-sm btn-danger" role="button" onclick="del_space('{{jumbo[2]}}')">Delete Space »</a>
+                <a class="btn btn-sm btn-danger" role="button" onclick="del_space('{{key}}')">Delete Space »</a>
                 {% else %}
                 <a class="btn btn-sm btn-secondary" role="button"> Update Space »</a>
                 <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
