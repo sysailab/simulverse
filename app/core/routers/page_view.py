@@ -19,9 +19,14 @@ BASE_DIR = dirname(dirname(abspath(__file__)))
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
 
 @router.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
-    return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
+async def root(request: Request, auth_user= Depends(get_current_user)):
+    if not auth_user :
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": False})
+    else:
+        data = {'text': '<h1>Welcome to the Simulverse Management System </h1>\n'}  
+        return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True})
+    
 
 @router.get("/view/", response_class=HTMLResponse)
 async def view(request: Request, auth_user= Depends(get_current_user)):
