@@ -36,14 +36,12 @@ async def handle_create(request: Request, auth_user= Depends(get_current_user)):
         form = CreateSpaceForm(request)
         await form.load_data()
         
-        token = request.cookies.get('access_token')
-        payload = jwt.decode(token.split()[1], config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM])
-        userid: str = payload.get("sub")
-        
-        if await db_manager.create_space(userid, form):
-            response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
-        else:
-            response = RedirectResponse("/", status_code=status.HTTP_302_FOUND)
+        if await form.is_valid():
+            token = request.cookies.get('access_token')
+            payload = jwt.decode(token.split()[1], config.JWT_SECRET_KEY, algorithms=[config.ALGORITHM])
+            userid: str = payload.get("sub")
+            
+            await db_manager.create_space(userid, form)
 
-        
+        response = RedirectResponse("/view/", status_code=status.HTTP_302_FOUND)
         return response

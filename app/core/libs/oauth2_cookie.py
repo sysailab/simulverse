@@ -15,7 +15,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         tokenUrl: str,
         scheme_name: Optional[str] = None,
         scopes: Optional[Dict[str, str]] = None,
-        auto_error: bool = True,
+        auto_error: bool = False,
     ):
         if not scopes:
             scopes = {}
@@ -26,7 +26,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         authorization: str = request.cookies.get(
             "access_token"
         )  # changed to accept access token from httpOnly Cookie
-
+        
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":
             if self.auto_error:

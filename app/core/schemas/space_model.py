@@ -32,7 +32,14 @@ class CreateSpaceForm:
             else:
                 self.form_data[k].append(v)
 
-
+    async def is_valid(self):
+        if not self.form_data['space_name'][0]:
+            self.errors.append("Space name is required")
+        if not self.form_data['space_explain'][0]:
+            self.errors.append("Space explanation is required")
+        if not self.errors:
+            return True
+        return False
 class CreateSceneForm: 
     def __init__(self, request: Request):
         self.request: Request = request

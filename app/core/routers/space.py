@@ -27,19 +27,21 @@ async def space(request: Request, space_id:str, auth_user= Depends(get_current_u
         return response
     else:
         space = await db_manager.get_space(ObjectId(space_id))
-        if str(auth_user.id) in space.viewers:
-            data = {'text':f"<h1>{space.name}</h1><p/><h3>{space.explain}</h3>",
-                    'role':space.viewers[str(auth_user.id)], 'scenes':space.scenes, 'space_id':space.id}
-            
-            '''
-            data.text = space explain
-            data.scenes
-            data.space_id
-            data.role
-            '''
-            return templates.TemplateResponse("space/view_space.html", {"request": request, "data": data, "login":True})
-        else:
-            response = RedirectResponse("/?error=401", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+        if space:
+            if str(auth_user.id) in space.viewers:
+                data = {'text':f"<h1>{space.name}</h1><p/><h3>{space.explain}</h3>",
+                        'role':space.viewers[str(auth_user.id)], 'scenes':space.scenes, 'space_id':space.id}
+                
+                '''
+                data.text = space explain
+                data.scenes
+                data.space_id
+                data.role
+                '''
+                return templates.TemplateResponse("space/view_space.html", {"request": request, "data": data, "login":True})
+            else:
+                response = RedirectResponse("/?error=401", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
+                return response
 
 @router.get("/space/insert/{space_id}", response_class=HTMLResponse)        
 async def insert_scene(request: Request, space_id:str, auth_user= Depends(get_current_user)):
@@ -50,7 +52,7 @@ async def insert_scene(request: Request, space_id:str, auth_user= Depends(get_cu
         scenes = await db_manager.get_scenes_from_space(ObjectId(space_id))
         
         data = {"scenes":scenes}
-        return templates.TemplateResponse("space/create_scene.html", {"request": request, "data":data})
+        return templates.TemplateResponse("space/create_scene.html", {"request": request, "data":data, "login":True})
 
 @router.post("/space/insert/{space_id}", response_class=HTMLResponse)        
 async def handle_insert_scene(request: Request, space_id:str, auth_user= Depends(get_current_user)):
@@ -66,7 +68,9 @@ async def handle_insert_scene(request: Request, space_id:str, auth_user= Depends
             response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
             return response
         else:
-            return templates.TemplateResponse(f"/space/insert/{space_id}", form.__dict__)
+            form.__dict__.update(request=request)
+            form.__dict__.update(data={})
+            return templates.TemplateResponse(f"space/create_scene.html", form.__dict__)
 
 @router.get("/space/scene/{space_id}/{scene_id}", response_class=HTMLResponse)
 async def scene(request: Request, space_id: str, scene_id:str, auth_user= Depends(get_current_user)):
@@ -142,13 +146,15 @@ async def edit_space(request: Request, space_id:str, auth_user= Depends(get_curr
         return response
     else:
         space = await db_manager.get_space(ObjectId(space_id))
-        if space.viewers[str(auth_user.id)] == 'Editor' and str(auth_user.id) in space.viewers:
+        if space.viewers[str(auth_user.id)] == 'Editor' or str(auth_user.id) in space.viewers:
             viewers = {}
             for user, val in space.viewers.items():
+                print(user, val)
                 _user = await db_manager.get_user_by_id(ObjectId(user))
                 if auth_user.email != _user.email:
                     viewers[_user.email] = val
-
+            
+            print(viewers)
             data = {'space_name':space.name, 'space_explain':space.explain, 'invite_lists':viewers}
             return templates.TemplateResponse("space/update_space.html", {"request": request, "data": data, "login":True})
         else:
@@ -166,7 +172,7 @@ async def handle_update_space(request: Request, space_id:str, auth_user= Depends
 
         await db_manager.update_space(auth_user, ObjectId(space_id), form)
         
-        response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
+        response = RedirectResponse(f"/view/", status_code=status.HTTP_302_FOUND)
         return response
 
 @router.post("/space/delete/scene/{space_id}/{scene_id}", response_class=HTMLResponse)

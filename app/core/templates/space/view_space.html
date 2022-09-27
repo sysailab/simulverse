@@ -72,11 +72,8 @@ function del_space(space_id) {
     {% if data.role == 'Editor' %}
             <a class="btn btn-sm btn-primary" href="/space/insert/{{data.space_id}}"
                 role="button">Insert Scene »</a>
-            <a class="btn btn-sm btn-danger" 
-                role="button" onclick="del_space('{{data.space_id}}')">Delete Space »</a>
         {% else %}
             <a class="btn btn-sm btn-secondary" role="button">Insert Scene »</a>
-            <a class="btn btn-sm btn-secondary" role="button"> Delete Space »</a>
         {% endif %}
 </main><!-- /.container -->
 

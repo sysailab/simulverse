@@ -81,18 +81,21 @@ class db_manager(object):
     @classmethod
     async def update_space(cls, creator: UserInDB, space_id:ObjectId, space:CreateSpaceForm):
         viewers = {str(creator.id):'Editor'}
+        
         for _id, role in zip(space.form_data['username'], space.form_data['role']):
             view = await cls.get_user_by_email(_id)
             if view :
                 if str(creator.id) != str(view.id):
                     viewers[str(view.id)] = role
+        
+        for _id, role in viewers.items():
+            await db_manager.get_collection('users').update_one({'_id':ObjectId(_id)}, [{"$set": {'spaces': {str(space_id): role}}}])
 
         found_space = await db_manager.get_collection('spaces').find_one({'_id':space_id})
         for viewer, val in found_space['viewers'].items():
             if viewer not in viewers:
+                print("1",viewer)
                 await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, {"$unset": {f'spaces.{str(space_id)}': ""}}) 
-            else:
-                await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, [{"$set": {'spaces': {str(space_id): val}}}])
 
         data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 'viewers':viewers}
 
@@ -204,7 +207,10 @@ class db_manager(object):
     @classmethod
     async def get_space(cls, space_id: ObjectId):
         cursor = await cls.get_collection("spaces").find_one({"_id":space_id})
-        return SpaceModel(**cursor)
+        if cursor:
+            return SpaceModel(**cursor)
+        else:
+            return None
 
     @classmethod
     async def store_image(cls, filename:str, metadata, contents):
