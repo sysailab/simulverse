@@ -30,37 +30,6 @@
       {% endfor %}
     </div>
   </div>
-
-  <!-- 
-
-<script type="text/javascript">
-  function readSingleFile(e) {
-          const name = e[0].name;
-          document.getElementById("file-label").textContent = name;
-  }
-  
-</script>
-<div class="container">
-  <form action="/admin/regions/add_item" method="POST" enctype="multipart/form-data">
-    <div class="form-groupvid">
-      <label for="vid">Region ID</label>
-      <input class="form-control" id="vid" type="text" placeholder="Region ID" name="vrid" readonly=""/>
-    </div>
-    <label for="scene">Scene Name: </label>
-    <input class="form-control" id="scene" type="text" placeholder="Scene Name" name="SceneName"/>
-    <label for="file">Image File</label>
-    <input class="form-control" id="file" type="file" placeholder="Image" name="file" on="on" change="readSingleFile(this.files)"/>
-    <label for="left">Left Position</label> <img class="image" id="left" src="/images/left.png" style="width:25px; height:25px;"/>
-    <input class="form-control" id="left" type="text" placeholder="Enter Scene Name to connect" name="leftPos"/>
-    <label for="up">Up Position</label> <img class="image" id="up" src="/images/up.png" style="width:25px; height:25px;"/>
-    <input class="form-control" id="up" type="text" placeholder="Enter Scene Name to connect" name="upPos"/>
-    <label for="right">Right Position</label> <img class="image" id="up" src="/images/right.png" style="width:25px; height:25px;"/>
-    <input class="form-control" id="up" type="text" placeholder="Enter Scene Name to connect" name="rightPos"/>
-    <label for="down">Down Position</label> <img class="image" id="up" src="/images/down.png" style="width:25px; height:25px;"/>
-    <input class="form-control" id="up" type="text" placeholder="Enter Scene Name to connect" name="downPos"/>
-  </form>
-</div>
-  -->
   
     <form method="POST", enctype='multipart/form-data'>
       <section class="vh-100">
@@ -75,7 +44,7 @@
           <input
             class="form-control"
             id="scene_name"
-            placeholder="Enter unique space name"
+            placeholder="Enter space name"
             name="scene_name"
           />
         </div>

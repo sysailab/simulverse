@@ -28,6 +28,11 @@ async def do_insert(db):
             'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
             'spaces': {},
             'userid': 'cbchoi2'},
+            {'_id': ObjectId('632f214ab763ee36b2407770'),
+            'email': 'd@d.d',
+            'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
+            'spaces': {},
+            'userid': 'cbchoi2'},
             ]
 
     await db['users'].insert_many(data)

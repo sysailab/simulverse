@@ -5,6 +5,20 @@
 {% block head %}
 {{ super() }}
 
+<script type="text/javascript">
+  function verifyPassword() {  
+    var pw = document.getElementById("password").value;  
+    //check empty password field  
+    console.log(pw)
+    if(pw == "") {  
+       alert("Password is empty"); 
+       
+       return false;  
+    }
+    document.getElementById("myForm").submit();
+  }  
+</script>
+
 {% endblock %}
 {% block top_nav %}
     {% include 'include/topnav.html' %}
@@ -20,8 +34,8 @@
           {% endfor %}
       </div>
     </div>
-    <div class="row">
-      <form method="POST">
+    <div class="row" >
+      <form method="POST" id="myForm">
         <section class="vh-100">
   
           <div class="container-fluid h-custom">
@@ -32,9 +46,8 @@
               <p></p>
               <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                 <h4 class="mb-3">Sign-In</h4>
-                <form class="validation-form" novalidate>
+
                   <hr class="mb-4" />
-                <form>
                   <!-- Email input -->
                   <div class="form-outline mb-4">
                     <input
@@ -54,26 +67,19 @@
                     <input
                       type="password"
                       name="password"
-                      id="form3Example4"
+                      id="password"
                       class="form-control form-control-lg"
                       placeholder="Enter password"
                     />
-                    <label class="form-label" for="form3Example4">Password</label>
-                  </div>
-  
-                  <div class="d-flex justify-content-between align-items-center">
-                    <!-- Checkbox -->
-                    <div class="form-check mb-0">
-                      
-                    </div>
-                    <a href="#!" class="text-body">Forgot password?</a>
+                    <label class="form-label" for="password">Password</label>
                   </div>
   
                   <div class="text-center text-lg-start mt-4 pt-2">
                     <button
-                      type="submit"
+                      type="button"
                       class="btn btn-primary btn-lg"
                       style="padding-left: 2.5rem; padding-right: 2.5rem"
+                      onclick="verifyPassword()"
                     >
                       Login
                     </button>
@@ -82,12 +88,11 @@
                       <a href="/register/" class="link-danger">Register</a>
                     </p>
                   </div>
-                </form>
               </div>
             </div>
           </div>
         </section>
-      </form>
+      </form> 
     </div>
 </main><!-- /.container -->
 
