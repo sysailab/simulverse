@@ -185,10 +185,10 @@ class db_manager(object):
 
     @classmethod
     async def get_spaces(cls, creator: UserInDB):
-        spaces = []
+        spaces = {}
         for spaceid, role in creator.spaces.items():
             cursor = await cls.get_collection("spaces").find_one({"_id":ObjectId(spaceid)})
-            spaces.append((cursor["name"], cursor['explain'], spaceid, role))
+            spaces[spaceid] = [cursor["name"], cursor['explain'], role]
 
         return spaces
     

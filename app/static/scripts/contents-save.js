@@ -6,7 +6,7 @@
  */
  AFRAME.registerComponent('contents-save', {
     schema: {
-        scene_id: {type: 'string', default:"hello"},
+        space_id: {type: 'string', default:"hello"},
     },
 
     init: function () 
@@ -25,7 +25,7 @@
             
             this.setAttribute('material', 'color', 'green');
 
-            var url = '/space/scene/link/update/' + self.data.scene_id;
+            var url = '/space/scene/link/update/' + self.data.space_id;
             console.log(url)
             var xhr = new XMLHttpRequest();
             

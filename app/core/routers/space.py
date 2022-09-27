@@ -68,8 +68,8 @@ async def handle_insert_scene(request: Request, space_id:str, auth_user= Depends
         else:
             return templates.TemplateResponse(f"/space/insert/{space_id}", form.__dict__)
 
-@router.get("/space/scene/{scene_id}", response_class=HTMLResponse)
-async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_user)):
+@router.get("/space/scene/{space_id}/{scene_id}", response_class=HTMLResponse)
+async def scene(request: Request, space_id: str, scene_id:str, auth_user= Depends(get_current_user)):
     '''
     Fetch scene data
     :param request:browser's request, scene_id: id of a scene with ObjectID, auth_user: authuentication
@@ -93,7 +93,7 @@ async def scene(request: Request, scene_id:str, auth_user= Depends(get_current_u
                                              , target_link['roll']
                                              , target_link['_id']])
 
-        data = {'scene_id':scene_id, 'background':scene['image_id'], 'links':links}
+        data = {'space_id':space_id, 'background':scene['image_id'], 'links':links}
         return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data, "login":True})
 
 @router.get("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -166,7 +166,8 @@ async def handle_update_space(request: Request, space_id:str, auth_user= Depends
 
         await db_manager.update_space(auth_user, ObjectId(space_id), form)
         
-        return templates.TemplateResponse("space/create_space.html", {"request": request, "data": {}, "login":True})
+        response = RedirectResponse(f"/space/view/{space_id}", status_code=status.HTTP_302_FOUND)
+        return response
 
 @router.post("/space/delete/scene/{space_id}/{scene_id}", response_class=HTMLResponse)
 async def handle_delete_scene(request: Request, space_id:str, scene_id:str, auth_user= Depends(get_current_user)):
@@ -197,17 +198,24 @@ async def handle_delete_space(request: Request, space_id:str, auth_user= Depends
         response = RedirectResponse(f"/", status_code=status.HTTP_302_FOUND)
         return response
 
-@router.put("/space/scene/link/update/{scene_id}")
-async def handle_link_update(request: Request, scene_id:str, auth_user= Depends(get_current_user)):
+@router.put("/space/scene/link/update/{space_id}")
+async def handle_link_update(request: Request, space_id:str, auth_user= Depends(get_current_user)):
     if not auth_user :
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
         # check ownership
-        _body = await request.body()
-        _body = result = json.loads(_body.decode('utf-8'))
-        for key, val in _body.items():
-            data = {'x':val[0]["x"], 'y':val[0]["y"], 'z':val[0]["z"], 'yaw':val[1]["x"], 'pitch':val[1]["y"], "roll":val[1]["z"]}
-            link = await db_manager.get_collection('links').update_one({'_id':ObjectId(key)}, {'$set':data})
+        spaces = await db_manager.get_spaces(auth_user)
         
-        return 'done'
+        print(spaces)
+        if spaces[space_id][2] == 'Editor':
+            _body = await request.body()
+            _body = result = json.loads(_body.decode('utf-8'))
+            for key, val in _body.items():
+                data = {'x':val[0]["x"], 'y':val[0]["y"], 'z':val[0]["z"], 'yaw':val[1]["x"], 'pitch':val[1]["y"], "roll":val[1]["z"]}
+                link = await db_manager.get_collection('links').update_one({'_id':ObjectId(key)}, {'$set':data})
+            
+            return 'done'
+        else:
+            return 'Not authorized'
+       
