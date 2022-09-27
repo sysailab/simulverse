@@ -6,9 +6,11 @@
 {{ super() }}
 
 {% endblock %}
+{% block top_nav %}
+    {% include 'include/topnav.html' %}
+{%  endblock %}
 
 {% block page_content %}
-{% include 'include/sidebar.html' %}
 
 <main role="main" class="container">
     <div class="row">
