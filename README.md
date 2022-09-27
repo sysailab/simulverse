@@ -95,3 +95,22 @@
  ┣ 📜__init__.py
  ┗ 📜main.py
 ```
+
+## `core/libs`
+ - contains utility libraries
+
+## `core/models`
+ - drivers for database
+ - dirvers for authentication
+
+## `core/routers`
+ - Contains routing map
+
+## `core/schemas`
+ - Contains database schemas
+
+## `core/templates`
+ - Continas jinja2 templates
+
+## `core/static`
+ - Contains css, images, and javascripts files.
