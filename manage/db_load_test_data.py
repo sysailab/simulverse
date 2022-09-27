@@ -18,13 +18,19 @@ async def do_check(db, collections:list):
             pprint.pprint(document)
 
 async def do_insert(db):
-    data = {'_id': ObjectId('632f214ab763ee36b2407777'),
+    data = [{'_id': ObjectId('632f214ab763ee36b2407777'),
             'email': 'cbchoi@example.com',
             'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
             'spaces': {'632f2162b763ee36b2407778':'Editor'},
-            'userid': 'cbchoi'}
+            'userid': 'cbchoi'},
+            {'_id': ObjectId('632f214ab763ee36b2407778'),
+            'email': 'c@c.c',
+            'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
+            'spaces': {},
+            'userid': 'cbchoi2'},
+            ]
 
-    await db['users'].insert_one(data)
+    await db['users'].insert_many(data)
     #db['space']
     data = {'_id':ObjectId('632f2162b763ee36b2407778'),'creator':ObjectId('632f214ab763ee36b2407777'), 'explain': 'seni and jaiyun', 'name': 'N4@417','scenes': {'632f2186b763ee36b240777b': '1234',
             '632f21a1b763ee36b2407785': '11421'}, 'viewers': {'632f214ab763ee36b2407777': 'Editor'}}

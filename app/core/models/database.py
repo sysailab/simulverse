@@ -113,9 +113,10 @@ class db_manager(object):
         for plink in proc_links:
             target_id, _ = plink[0].split(".")
             
-            data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
-            res = await db_manager.get_collection('links').insert_one(data)
-            check_list.append(res.inserted_id)
+            if target_id != "":
+                data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
+                res = await db_manager.get_collection('links').insert_one(data)
+                check_list.append(res.inserted_id)
 
         data = {'name':form.scene_name, 'image_id':image_id, 'links':check_list}
         scene_id = await db_manager.get_collection('scenes').insert_one(data)

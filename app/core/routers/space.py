@@ -203,8 +203,7 @@ async def handle_link_update(request: Request, scene_id:str, auth_user= Depends(
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        # delete scene
-        #result = await db_manager.get_collection('scenes').find_one({'_id':ObjectId(scene_id)})
+        # check ownership
         _body = await request.body()
         _body = result = json.loads(_body.decode('utf-8'))
         for key, val in _body.items():
