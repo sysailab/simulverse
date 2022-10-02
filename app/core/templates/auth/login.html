@@ -7,9 +7,15 @@
 
 <script type="text/javascript">
   function verifyPassword() {  
+    var un = document.getElementById("username").value;  
+    //check empty username field  
+    if(un == "") {  
+       alert("E-mail is empty"); 
+       
+       return false;  
+    }
     var pw = document.getElementById("password").value;  
     //check empty password field  
-    console.log(pw)
     if(pw == "") {  
        alert("Password is empty"); 
        
@@ -53,7 +59,7 @@
                     <input
                       type="email"
                       name="username"
-                      id="form3Example3"
+                      id="username"
                       class="form-control form-control-lg"
                       placeholder="Enter a valid email address"
                     />
