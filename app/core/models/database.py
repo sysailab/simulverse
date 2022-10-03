@@ -94,7 +94,7 @@ class db_manager(object):
         found_space = await db_manager.get_collection('spaces').find_one({'_id':space_id})
         for viewer, val in found_space['viewers'].items():
             if viewer not in viewers:
-                print("1",viewer)
+                #print("1",viewer)
                 await db_manager.get_collection('users').update_one({'_id':ObjectId(viewer)}, {"$unset": {f'spaces.{str(space_id)}': ""}}) 
 
         data = {'name':space.form_data['space_name'][0], 'explain': space.form_data['space_explain'][0], 'viewers':viewers}
@@ -139,7 +139,7 @@ class db_manager(object):
 
         prev_scene = await db_manager.get_collection('scenes').find_one(scene_id)
         proc_links = list(zip(form.scene, form.x, form.y, form.z, form.yaw, form.pitch, form.roll))
-        print(proc_links)
+        #print(proc_links)
 
         prev_links = prev_scene['links']
 
@@ -151,7 +151,7 @@ class db_manager(object):
                 if ObjectId(link_id) in prev_links:
                     prev_links.remove(ObjectId(link_id))
                 data = {'x':plink[1], 'y':plink[2], 'z':plink[3],'target_id':ObjectId(target_id), 'yaw':plink[4], 'pitch':plink[5], 'roll':plink[6],}
-                print(data)
+                #print(data)
                 await db_manager.get_collection('links').update_one({'_id':ObjectId(link_id)}, {'$set':data})
             else:
                 if target_id != "":

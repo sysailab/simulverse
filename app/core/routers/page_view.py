@@ -37,9 +37,9 @@ async def view(request: Request, auth_user= Depends(get_current_user)):
         spaces = await db_manager.get_spaces(auth_user)
         data = {'text':'<h1>Welcome to the Simulverse Management System </h1>', 'spaces':spaces} 
         
-        print(data)
         errors = []
         if 'error' in request.query_params:
             errors = [ resolve_error(x) for x in request.query_params['error'].split('.')]
         
+        #print(errors)
         return templates.TemplateResponse("page.html", {"request": request, "data": data, "login": True, "errors":errors})
