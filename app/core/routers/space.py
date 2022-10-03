@@ -149,12 +149,12 @@ async def edit_space(request: Request, space_id:str, auth_user= Depends(get_curr
         if space.viewers[str(auth_user.id)] == 'Editor' or str(auth_user.id) in space.viewers:
             viewers = {}
             for user, val in space.viewers.items():
-                print(user, val)
+                #print(user, val)
                 _user = await db_manager.get_user_by_id(ObjectId(user))
                 if auth_user.email != _user.email:
                     viewers[_user.email] = val
             
-            print(viewers)
+            #print(viewers)
             data = {'space_name':space.name, 'space_explain':space.explain, 'invite_lists':viewers}
             return templates.TemplateResponse("space/update_space.html", {"request": request, "data": data, "login":True})
         else:
@@ -169,10 +169,13 @@ async def handle_update_space(request: Request, space_id:str, auth_user= Depends
     else:
         form = CreateSpaceForm(request)
         await form.load_data()
-
-        await db_manager.update_space(auth_user, ObjectId(space_id), form)
         
-        response = RedirectResponse(f"/view/", status_code=status.HTTP_302_FOUND)
+        response = None
+        if await form.is_valid():
+            await db_manager.update_space(auth_user, ObjectId(space_id), form)
+            response = RedirectResponse(f"/view/", status_code=status.HTTP_302_FOUND)
+        else:
+            response = RedirectResponse(f"/view/?error=c01", status_code=status.HTTP_302_FOUND)
         return response
 
 @router.post("/space/delete/scene/{space_id}/{scene_id}", response_class=HTMLResponse)
@@ -213,7 +216,7 @@ async def handle_link_update(request: Request, space_id:str, auth_user= Depends(
         # check ownership
         spaces = await db_manager.get_spaces(auth_user)
         
-        print(spaces)
+        #spaces)
         if spaces[space_id][2] == 'Editor':
             _body = await request.body()
             _body = result = json.loads(_body.decode('utf-8'))
