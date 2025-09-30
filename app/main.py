@@ -48,6 +48,79 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return {"access_token": access_token, "token_type": "bearer"}
 
 @app.exception_handler(HTTPException)
-async def unicorn_exception_handler(request: Request, exc: HTTPException):
-    response = RedirectResponse("/login/?errors=401", status_code=status.HTTP_302_FOUND)
-    return response
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Handle HTTP exceptions with appropriate responses based on status code."""
+
+    # 400 Bad Request - Invalid input
+    if exc.status_code == 400:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "status_code": 400,
+                "message": "잘못된 요청입니다.",
+                "detail": exc.detail or "입력값을 확인해주세요."
+            },
+            status_code=400
+        )
+
+    # 401 Unauthorized - Not authenticated
+    elif exc.status_code == 401:
+        return RedirectResponse("/login/?error=unauthorized", status_code=status.HTTP_302_FOUND)
+
+    # 403 Forbidden - Not authorized
+    elif exc.status_code == 403:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "status_code": 403,
+                "message": "접근 권한이 없습니다.",
+                "detail": "이 작업을 수행할 권한이 없습니다."
+            },
+            status_code=403
+        )
+
+    # 404 Not Found
+    elif exc.status_code == 404:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "status_code": 404,
+                "message": "페이지를 찾을 수 없습니다.",
+                "detail": "요청하신 리소스가 존재하지 않습니다."
+            },
+            status_code=404
+        )
+
+    # 500 Internal Server Error
+    elif exc.status_code == 500:
+        # Log the error for debugging
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Internal server error: {exc.detail}")
+
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "status_code": 500,
+                "message": "서버 오류가 발생했습니다.",
+                "detail": "잠시 후 다시 시도해주세요."
+            },
+            status_code=500
+        )
+
+    # Default - other status codes
+    else:
+        return templates.TemplateResponse(
+            "error.html",
+            {
+                "request": request,
+                "status_code": exc.status_code,
+                "message": f"오류가 발생했습니다 ({exc.status_code})",
+                "detail": exc.detail or "알 수 없는 오류입니다."
+            },
+            status_code=exc.status_code
+        )

@@ -13,6 +13,7 @@ from ..models.database import db_manager
 from ..config import settings
 from ..models.auth_manager import get_current_user
 from ..schemas.space_model import CreateSpaceForm, SpaceModel
+from ..libs.utils import validate_object_id
 
 
 router = APIRouter(include_in_schema=False)
@@ -24,12 +25,12 @@ from fastapi.responses import StreamingResponse
 
 import io
 
-@router.get("/asset/image/{image_id}", 
+@router.get("/asset/image/{image_id}",
         responses = {
             200: {
                 "content": {"image/png": {}}}
-        }, response_class=Response)        
+        }, response_class=Response)
 async def image(request: Request, image_id:str, auth_user= Depends(get_current_user)):
-    image_bytes, content_type = await db_manager.download_file(ObjectId(image_id))
+    image_bytes, content_type = await db_manager.download_file(validate_object_id(image_id))
     return Response(content=image_bytes, media_type=content_type)
 

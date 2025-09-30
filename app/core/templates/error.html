@@ -1,36 +1,59 @@
 
 {% extends "base.html" %}
 
-{% block title %}Simulverse Management System{% endblock %}
+{% block title %}{{ status_code or 'Error' }} - Simulverse{% endblock %}
 {% block head %}
 {{ super() }}
-
+<style>
+    .error-container {
+        text-align: center;
+        padding: 50px 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    .error-code {
+        font-size: 72px;
+        font-weight: bold;
+        color: #dc3545;
+        margin-bottom: 20px;
+    }
+    .error-message {
+        font-size: 28px;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    .error-detail {
+        font-size: 16px;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    .error-actions {
+        margin-top: 30px;
+    }
+    .error-actions a {
+        margin: 0 10px;
+    }
+</style>
 {% endblock %}
 
 {% block page_content %}
 {% include 'include/sidebar.html' %}
 
-{% with msg=msg %}
-    {% include "include/alerts.html" %}
-{% endwith %}
-
-{% if data.alert == "True" %}
-  <div class="alert alert-info" role="alert">
-    {{data.msg}}
-  </div>
-{% endif %}
-
 <main role="main" class="container">
-    <div class="row">
-        
-    </div>
-</main><!-- /.container -->
+    <div class="error-container">
+        <div class="error-code">{{ status_code or '500' }}</div>
+        <div class="error-message">{{ message or '오류가 발생했습니다' }}</div>
+        <div class="error-detail">{{ detail or '알 수 없는 오류입니다.' }}</div>
 
+        <div class="error-actions">
+            <a href="javascript:history.back()" class="btn btn-secondary">이전 페이지로</a>
+            <a href="/" class="btn btn-primary">홈으로 돌아가기</a>
+        </div>
+    </div>
+</main>
 
 {% endblock %}
 
 {% block scripts %}
 {{ super() }}
-
-
 {% endblock %}
