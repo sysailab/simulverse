@@ -233,3 +233,122 @@ class db_manager(object):
         res = db_manager.get_collection('links').find({})
 
         await db_manager.get_collection('spaces').update_one({'_id':space_id}, {'$unset':{f"scenes.{str(scene_id)}":""}})
+
+    # ============================================
+    # POI Methods
+    # ============================================
+
+    @classmethod
+    async def create_poi(cls, scene_id: ObjectId, poi_data: dict) -> ObjectId:
+        """
+        Create a new POI in a scene.
+
+        Args:
+            scene_id: ObjectId of the scene
+            poi_data: Dictionary containing POI data
+
+        Returns:
+            ObjectId: ID of the created POI
+        """
+        from datetime import datetime
+
+        # Generate POI ID
+        poi_id = ObjectId()
+        poi_data['poi_id'] = poi_id
+        poi_data['created_at'] = datetime.utcnow()
+        poi_data['updated_at'] = datetime.utcnow()
+
+        # Add POI to scene's pois array
+        await cls.db.scenes.update_one(
+            {"_id": scene_id},
+            {"$push": {"pois": poi_data}}
+        )
+
+        return poi_id
+
+    @classmethod
+    async def get_pois(cls, scene_id: ObjectId) -> list:
+        """
+        Get all POIs for a scene.
+
+        Args:
+            scene_id: ObjectId of the scene
+
+        Returns:
+            list: List of POI dictionaries
+        """
+        scene = await cls.db.scenes.find_one({"_id": scene_id})
+        return scene.get('pois', []) if scene else []
+
+    @classmethod
+    async def get_poi(cls, scene_id: ObjectId, poi_id: ObjectId) -> dict | None:
+        """
+        Get a specific POI by ID.
+
+        Args:
+            scene_id: ObjectId of the scene
+            poi_id: ObjectId of the POI
+
+        Returns:
+            dict | None: POI data or None if not found
+        """
+        scene = await cls.db.scenes.find_one(
+            {"_id": scene_id, "pois.poi_id": poi_id},
+            {"pois.$": 1}
+        )
+
+        if scene and 'pois' in scene and len(scene['pois']) > 0:
+            return scene['pois'][0]
+        return None
+
+    @classmethod
+    async def update_poi(cls, scene_id: ObjectId, poi_id: ObjectId, update_data: dict) -> bool:
+        """
+        Update a POI.
+
+        Args:
+            scene_id: ObjectId of the scene
+            poi_id: ObjectId of the POI
+            update_data: Dictionary containing fields to update
+
+        Returns:
+            bool: True if updated successfully
+        """
+        from datetime import datetime
+
+        # Add updated timestamp
+        update_data['updated_at'] = datetime.utcnow()
+
+        # Build update query for nested array element
+        update_fields = {f"pois.$.{key}": value for key, value in update_data.items()}
+
+        result = await cls.db.scenes.update_one(
+            {"_id": scene_id, "pois.poi_id": poi_id},
+            {"$set": update_fields}
+        )
+
+        return result.modified_count > 0
+
+    @classmethod
+    async def delete_poi(cls, scene_id: ObjectId, poi_id: ObjectId) -> bool:
+        """
+        Delete a POI from a scene.
+
+        Args:
+            scene_id: ObjectId of the scene
+            poi_id: ObjectId of the POI
+
+        Returns:
+            bool: True if deleted successfully
+        """
+        result = await cls.db.scenes.update_one(
+            {"_id": scene_id},
+            {"$pull": {"pois": {"poi_id": poi_id}}}
+        )
+
+        return result.modified_count > 0
+
+    @classmethod
+    def get_db(cls):
+        """Get database instance"""
+        return cls.db
