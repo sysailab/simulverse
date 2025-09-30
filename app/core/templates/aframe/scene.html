@@ -1,7 +1,7 @@
 {% extends "base.html" %} 
 {% block title %}Simulverse Management System{%endblock %} 
 
-{% block head %} 
+{% block head %}
 {{ super() }}
 <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
 <script src="https://unpkg.com/aframe-event-set-component@5/dist/aframe-event-set-component.min.js"></script>
@@ -10,6 +10,15 @@
 <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
 <script src="{{ url_for('static', path='/scripts/link-controls.js') }}" crossorigin="anonymous"></script>
 <script src="{{ url_for('static', path='/scripts/contents-save.js') }}" crossorigin="anonymous"></script>
+
+<!-- POI System Scripts -->
+<script src="{{ url_for('static', path='/scripts/poi-marker.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', path='/scripts/responsive-panel.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', path='/scripts/poi-editor.js') }}" crossorigin="anonymous"></script>
+<script src="{{ url_for('static', path='/scripts/poi-editor-component.js') }}" crossorigin="anonymous"></script>
+
+<!-- POI Modal CSS -->
+<link rel="stylesheet" href="{{ url_for('static', path='/css/poi-modal.css') }}">
 
 {% endblock %} 
 
@@ -34,22 +43,40 @@
         <!-- Images. -->
         <img id="background" src="/asset/image/{{data.background}}" crossorigin="anonymous">
       </a-assets>
-    
+
       <!-- 360-degree image. -->
       <a-sky id="image-360" radius="10" src="#background"></a-sky>
-    
-      <!-- Link template we will build. 
-      <a-entity id="links" layout="type: line; margin: 1.5" position="0 -1 -4">
-          <a-entity template="src: #link" data-src="#cubes" data-thumb="#cubes-thumb"></a-entity>
-          <a-entity template="src: #link" data-src="#city" data-thumb="#city-thumb"></a-entity>
-          <a-entity template="src: #link" data-src="#sechelt" data-thumb="#sechelt-thumb"></a-entity>
-        </a-entity>
-    
-      Camera + Cursor. -->
+
+      <!-- POI Editor (Editor only) -->
+      {% if data.is_editor %}
+      <a-entity poi-editor="enabled: true"></a-entity>
+      {% endif %}
+
+      <!-- Links -->
       {% for link in data.links%}
       <a-link class="clickable" title="{{link[0]}}" href="/space/scene/{{data.space_id}}/{{link[1]}}" origin="{{link[8]}}"
               position="{{link[2]}} {{link[3]}} {{link[4]}}" rotation="{{link[5]}} {{link[6]}} {{link[7]}}"></a-link>
       {% endfor%}
+
+      <!-- POIs -->
+      {% for poi in data.pois %}
+      <a-entity
+        poi-marker="
+          poiId: {{ poi.poi_id }};
+          type: {{ poi.type }};
+          title: {{ poi.title }};
+          description: {{ poi.description or '' }};
+          {% if poi.image_id %}imageUrl: /asset/image/{{ poi.image_id }};{% endif %}
+          {% if poi.target_scene_id %}targetSceneId: {{ poi.target_scene_id }};{% endif %}
+          {% if poi.media_url %}mediaUrl: {{ poi.media_url }};{% endif %}
+          {% if poi.media_type %}mediaType: {{ poi.media_type }};{% endif %}
+        "
+        position="{{ poi.position.x }} {{ poi.position.y }} {{ poi.position.z }}"
+        rotation="{{ poi.rotation.x }} {{ poi.rotation.y }} {{ poi.rotation.z }}"
+        scale="{{ poi.scale.x }} {{ poi.scale.y }} {{ poi.scale.z }}"
+        visible="{{ 'true' if poi.visible else 'false' }}"
+      ></a-entity>
+      {% endfor %}
 
       <a-box class="clickable" contents-save="space_id:{{data.space_id}}" height="0.5" width="0.5" position="0 -2 -2" color="red"></a-box>
 
@@ -61,8 +88,18 @@
           animation__fusing="property: scale; from: 1 1 1; to: 0.1 0.1 0.1; easing: easeInCubic; dur: 150; startEvents: fusing"></a-cursor>
       </a-camera>
     </a-scene>
-        
+
   </div>
+
+  <!-- Initialize POI Editor -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize POI editor with scene and space IDs
+      {% if data.is_editor %}
+      initPOIEditor('{{ data.scene_id }}', '{{ data.space_id }}');
+      {% endif %}
+    });
+  </script>
 </main>
 <!-- /.container -->
 

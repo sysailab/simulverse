@@ -99,12 +99,13 @@ async def scene(request: Request, space_id: str, scene_id:str, auth_user= Depend
         response = RedirectResponse("/login", status_code=status.HTTP_307_TEMPORARY_REDIRECT)
         return response
     else:
-        scene = await db_manager.get_scene(validate_object_id(scene_id))
+        scene_oid = validate_object_id(scene_id)
+        scene = await db_manager.get_scene(scene_oid)
         links = []
         for link in scene["links"]:
             target_link = await db_manager.get_collection("links").find_one({'_id':link})
             target_name = await db_manager.get_scene(target_link['target_id'])
-            
+
             links.append([target_name['name'], target_link['target_id']
                                              , target_link['x']
                                              , target_link['y']
@@ -114,7 +115,31 @@ async def scene(request: Request, space_id: str, scene_id:str, auth_user= Depend
                                              , target_link['roll']
                                              , target_link['_id']])
 
-        data = {'space_id':space_id, 'background':scene['image_id'], 'links':links}
+        # Get POIs for this scene
+        pois = await db_manager.get_pois(scene_oid)
+
+        # Convert ObjectIds to strings for template
+        for poi in pois:
+            if 'poi_id' in poi:
+                poi['poi_id'] = str(poi['poi_id'])
+            if 'image_id' in poi and poi['image_id']:
+                poi['image_id'] = str(poi['image_id'])
+            if 'target_scene_id' in poi and poi['target_scene_id']:
+                poi['target_scene_id'] = str(poi['target_scene_id'])
+
+        # Check if user has Editor permission
+        space = await db_manager.get_space(validate_object_id(space_id))
+        user_id = str(auth_user.id)
+        is_editor = user_id in space.viewers and space.viewers[user_id] == 'Editor'
+
+        data = {
+            'space_id': space_id,
+            'scene_id': scene_id,
+            'background': scene['image_id'],
+            'links': links,
+            'pois': pois,
+            'is_editor': is_editor
+        }
         return templates.TemplateResponse("aframe/scene.html", {"request": request, "data": data, "login":True})
 
 @router.get("/space/scene/edit/{space_id}/{scene_id}", response_class=HTMLResponse)
