@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field
+from typing import Optional
 
 class Token(BaseModel):
-    access_token: str | str
-    token_type: str | None = None
+    access_token: str
+    token_type: Optional[str] = None
 
 
 class TokenData(BaseModel):
-    email: str =""
+    email: str = ""

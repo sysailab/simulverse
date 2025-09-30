@@ -14,7 +14,7 @@ from starlette.responses import RedirectResponse
 from .core.models.database import db_manager
 from .core.models.auth_manager import auth_manager
 from .core.schemas.token_model import Token
-from .core.instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
+from .core.config import settings
 
 from app.core.routers import page_view, register, login, create, space, asset
 
@@ -23,7 +23,7 @@ templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'core/templates')))
 
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=str(Path(BASE_DIR, 'static'))), name="static")
-db_manager.init_manager(MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 
 app.include_router(register.router, prefix="", tags=["register"])
 app.include_router(page_view.router, prefix="", tags=["home"])
@@ -41,7 +41,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = await auth_manager.create_access_token(
         data={"sub": user.userid}, expires_delta=access_token_expires
     )

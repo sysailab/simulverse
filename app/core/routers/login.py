@@ -9,13 +9,13 @@ from starlette.responses import RedirectResponse
 
 from ..models.database import db_manager
 from ..models.auth_manager import auth_manager
-from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..config import settings
 from ..schemas.user_model import UserLoginForm, UserModel
 from ..libs.resolve_error import resolve_error
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
@@ -31,7 +31,7 @@ def render_login(request: Request):
 async def handle_login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     user = await auth_manager.authenticate_user(form_data.username, form_data.password)
     if user :
-        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = await auth_manager.create_access_token(
             data={"sub": user.email}, expires_delta=access_token_expires
         )

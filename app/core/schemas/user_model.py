@@ -1,19 +1,22 @@
 from fastapi import Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from bson.objectid import ObjectId
+from typing import Dict, Any
 
 class UserModel(BaseModel):
-    userid: str  = ""
+    userid: str = ""
     email: str = ""
 
 class UserInDB(UserModel):
+    model_config = ConfigDict(
+        populate_by_name=True,
+        arbitrary_types_allowed=True,
+        json_encoders={ObjectId: str}
+    )
+
     id: ObjectId = Field(default_factory=ObjectId, alias="_id")
     hashed_password: str = ""
-    spaces:dict = {}
-    class Config:
-        allow_population_by_field_name = True
-        arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
+    spaces: Dict[str, Any] = {}
     
 class UserRegisterForm: 
     def __init__(self, request: Request):

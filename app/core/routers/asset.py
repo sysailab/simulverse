@@ -10,14 +10,14 @@ from jose import JWTError, jwt
 from bson.objectid import ObjectId
 
 from ..models.database import db_manager
-from ..instance import config
+from ..config import settings
 from ..models.auth_manager import get_current_user
 from ..schemas.space_model import CreateSpaceForm, SpaceModel
 
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(config.MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 from fastapi.responses import StreamingResponse

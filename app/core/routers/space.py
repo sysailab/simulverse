@@ -7,7 +7,7 @@ from starlette.responses import RedirectResponse
 from bson.objectid import ObjectId
 
 from ..models.database import db_manager
-from ..instance import config
+from ..config import settings
 from ..models.auth_manager import get_current_user
 from ..schemas.space_model import CreateSceneForm, CreateSpaceForm, UpdateSceneForm
 
@@ -15,7 +15,7 @@ import json
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(config.MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))

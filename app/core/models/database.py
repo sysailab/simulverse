@@ -24,7 +24,7 @@ class db_manager(object):
         return cls.db[name]
 
     @classmethod
-    async def get_user_by_email(cls, email: str) -> UserInDB|None:
+    async def get_user_by_email(cls, email: str) -> UserInDB | None:
         document = await cls.get_collection("users").find_one({'email': email})
         if document:
             return UserInDB(**document)
@@ -32,7 +32,7 @@ class db_manager(object):
             return None
     
     @classmethod
-    async def get_user_by_id(cls, userid:ObjectId) -> UserInDB|None:
+    async def get_user_by_id(cls, userid: ObjectId) -> UserInDB | None:
         document = await cls.get_collection("users").find_one({'_id': userid})
         if document:
             return UserInDB(**document)

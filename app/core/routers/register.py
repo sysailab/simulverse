@@ -4,13 +4,13 @@ from fastapi import APIRouter, Depends, Request, responses, status
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from ..models.database import db_manager
-from ..instance.config import MONGODB_URL, ACCESS_TOKEN_EXPIRE_MINUTES
+from ..config import settings
 
 from ..schemas.user_model import UserRegisterForm, UserModel
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))

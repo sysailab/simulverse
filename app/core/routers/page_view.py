@@ -6,14 +6,14 @@ from fastapi.templating import Jinja2Templates
 from jose import jwt
 
 from ..models.database import db_manager
-from ..instance import config
+from ..config import settings
 from ..models.auth_manager import auth_manager, get_current_user
 from ..schemas.space_model import CreateSpaceForm
 from ..libs.resolve_error import resolve_error
 
 router = APIRouter(include_in_schema=False)
 
-db_manager.init_manager(config.MONGODB_URL, "simulverse")
+db_manager.init_manager(settings.MONGODB_URL, settings.MONGODB_DATABASE)
 BASE_DIR = dirname(dirname(abspath(__file__)))
 
 templates = Jinja2Templates(directory=str(Path(BASE_DIR, 'templates')))
