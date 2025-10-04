@@ -51,6 +51,23 @@
               position="{{link[2]}} {{link[3]}} {{link[4]}}" rotation="{{link[5]}} {{link[6]}} {{link[7]}}"></a-link>
       {% endfor%}
 
+      {% for poi in data.pois or [] %}
+      {% set pos = poi.position %}
+      {% set rot = poi.rotation %}
+      {% set scale = poi.scale %}
+      <a-entity position="{{ pos.x }} {{ pos.y }} {{ pos.z }}" rotation="{{ rot.x }} {{ rot.y }} {{ rot.z }}" scale="{{ scale.x }} {{ scale.y }} {{ scale.z }}">
+        {% if poi.type == 'link' and poi.target_scene_id %}
+        <a-link class="clickable" title="{{ poi.title }}" href="/space/scene/{{data.space_id}}/{{ poi.target_scene_id }}" position="0 0 0"></a-link>
+        {% else %}
+        <a-sphere radius="0.25" color="#4CAF50" class="clickable"></a-sphere>
+        <a-text value="{{ poi.title }}" align="center" position="0 0.6 0" color="#ffffff" width="3"></a-text>
+        {% if poi.description %}
+        <a-text value="{{ poi.description }}" align="center" position="0 -0.4 0" color="#eeeeee" width="4" wrap-count="32"></a-text>
+        {% endif %}
+        {% endif %}
+      </a-entity>
+      {% endfor %}
+
       <a-box class="clickable" contents-save="space_id:{{data.space_id}}" height="0.5" width="0.5" position="0 -2 -2" color="red"></a-box>
 
       <a-camera>

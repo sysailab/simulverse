@@ -16,6 +16,12 @@ import motor.motor_asyncio
 from bson import ObjectId
 from datetime import datetime
 
+# 로컬 유틸리티
+try:
+    from create_indexes import ensure_indexes
+except ImportError:
+    from manage.create_indexes import ensure_indexes
+
 # app 모듈 import
 from app.core.libs.utils import get_password_hash
 from app.core.config import settings
@@ -31,6 +37,9 @@ async def seed_database():
 
     # 또는 테스트 DB 사용
     # db = client[f"{settings.MONGODB_DATABASE}_test"]
+
+    print("🧱 인덱스 생성 확인 중...")
+    await ensure_indexes(db)
 
     print("🌱 시드 데이터 생성 시작...\n")
 

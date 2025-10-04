@@ -4,16 +4,12 @@ from typing import Optional
 from jwt import PyJWTError, encode, decode
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from passlib.context import CryptContext
-
 from .database import db_manager
 from ..schemas.user_model import UserModel, UserInDB
 from ..schemas.token_model import Token, TokenData
 from ..libs.utils import verify_password
 from ..libs.oauth2_cookie import OAuth2PasswordBearerWithCookie
 from ..config import settings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 oauth2_scheme = OAuth2PasswordBearerWithCookie(tokenUrl="/token", auto_error=False)
 

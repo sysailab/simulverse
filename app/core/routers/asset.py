@@ -7,9 +7,8 @@ from starlette.responses import RedirectResponse
 from starlette.responses import StreamingResponse
 
 from jose import JWTError, jwt
-from bson.objectid import ObjectId
-
 from ..models.database import db_manager
+from ..libs.utils import validate_object_id
 from ..config import settings
 from ..models.auth_manager import get_current_user
 from ..schemas.space_model import CreateSpaceForm, SpaceModel
@@ -30,6 +29,6 @@ import io
                 "content": {"image/png": {}}}
         }, response_class=Response)        
 async def image(request: Request, image_id:str, auth_user= Depends(get_current_user)):
-    image_bytes, content_type = await db_manager.download_file(ObjectId(image_id))
+    image_bytes, content_type = await db_manager.download_file(validate_object_id(image_id))
     return Response(content=image_bytes, media_type=content_type)
 

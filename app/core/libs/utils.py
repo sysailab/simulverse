@@ -1,6 +1,9 @@
 import bcrypt
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
+from bson.objectid import ObjectId
+from bson.errors import InvalidId
 
 #from app.instance import config
 from typing import Any
@@ -56,3 +59,13 @@ def verify_password(plain_password, hashed_password):
 
 def get_password_hash(password):
     return pwd_context.hash(password)
+
+
+def validate_object_id(id_value: Any) -> ObjectId:
+    """Convert a value into ObjectId or raise a 400 HTTPException."""
+    if isinstance(id_value, ObjectId):
+        return id_value
+    try:
+        return ObjectId(str(id_value))
+    except (InvalidId, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid ID format")

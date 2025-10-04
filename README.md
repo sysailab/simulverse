@@ -36,6 +36,15 @@ cp .env.example .env
 
 # Quick Start
 
+## 0. MongoDB Index Setup
+```bash
+cd manage
+python create_indexes.py
+```
+
+이 스크립트는 핵심 컬렉션(users, spaces, scenes, links)에 필요한 인덱스를 생성합니다.
+`manage/db_setup.py` 실행 시 자동으로 호출되지만, 스키마 변경 후에는 별도로 실행해 인덱스를 갱신할 수 있습니다.
+
 ## 1. Database Setup (테스트 데이터 생성)
 ```bash
 cd manage
