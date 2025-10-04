@@ -1,36 +1,30 @@
-
 {% extends "base.html" %}
 
-{% block title %}Simulverse Management System{% endblock %}
-{% block head %}
-{{ super() }}
-
-{% endblock %}
+{% block title %}{{ (data.title if data else '오류 발생') }} | Simulverse{% endblock %}
 
 {% block page_content %}
-{% include 'include/sidebar.html' %}
+<main role="main" class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="mb-4">
+                <span class="display-4 fw-bold text-danger">{{ data.code if data else '오류' }}</span>
+            </div>
+            <h2 class="mb-3">{{ data.title if data else '문제가 발생했습니다.' }}</h2>
+            <p class="lead">{{ data.message if data else '요청을 처리할 수 없습니다. 잠시 후 다시 시도해주세요.' }}</p>
 
-{% with msg=msg %}
-    {% include "include/alerts.html" %}
-{% endwith %}
+            {% if data and data.detail %}
+            <div class="alert alert-secondary text-start mt-4" role="alert">
+                <h6 class="alert-heading">세부 정보</h6>
+                <pre class="mb-0">{{ data.detail }}</pre>
+            </div>
+            {% endif %}
 
-{% if data.alert == "True" %}
-  <div class="alert alert-info" role="alert">
-    {{data.msg}}
-  </div>
-{% endif %}
-
-<main role="main" class="container">
-    <div class="row">
-        
+            <div class="mt-4">
+                <a href="/" class="btn btn-primary">홈으로 돌아가기</a>
+                <a href="/login" class="btn btn-outline-secondary ms-2">다시 로그인</a>
+            </div>
+        </div>
     </div>
-</main><!-- /.container -->
-
-
+</main>
 {% endblock %}
 
-{% block scripts %}
-{{ super() }}
-
-
-{% endblock %}

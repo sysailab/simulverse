@@ -125,9 +125,19 @@ class db_manager(object):
         scene_id = await db_manager.get_collection('scenes').insert_one(data)
         await db_manager.get_collection('spaces').update_one({'_id':ObjectId(space_id)}, [{"$set": {'scenes': {str(scene_id.inserted_id): form.scene_name}}}]) 
 
+    @classmethod
     async def create_link(cls, data:dict):
         link_id = await db_manager.get_collection('links').insert_one(data)
         return link_id
+
+    @classmethod
+    async def add_scene_poi(cls, scene_id: ObjectId, poi_data: dict):
+        await cls.get_collection('scenes').update_one({'_id': scene_id}, {'$push': {'pois': poi_data}})
+        return poi_data.get('poi_id')
+
+    @classmethod
+    async def remove_scene_poi(cls, scene_id: ObjectId, poi_id: ObjectId):
+        await cls.get_collection('scenes').update_one({'_id': scene_id}, {'$pull': {'pois': {'poi_id': poi_id}}})
 
     @classmethod
     async def update_scene(cls, form:UpdateSceneForm, space_id:ObjectId, scene_id:ObjectId ):
@@ -170,6 +180,8 @@ class db_manager(object):
     @classmethod
     async def get_scene(cls, scene_id:ObjectId ):
         scene = await db_manager.get_collection('scenes').find_one({"_id":scene_id})
+        if scene and 'pois' not in scene:
+            scene['pois'] = []
         return scene
 
     @classmethod

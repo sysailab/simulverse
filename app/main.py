@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -10,6 +12,7 @@ from datetime import timedelta
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from starlette.responses import RedirectResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .core.models.database import db_manager
 from .core.models.auth_manager import auth_manager
@@ -32,6 +35,15 @@ app.include_router(create.router, prefix="", tags=["create"])
 app.include_router(space.router, prefix="", tags=["space"])
 app.include_router(asset.router, prefix="", tags=["asset"])
 
+logger = logging.getLogger("simulverse.main")
+
+ERROR_PAGE_CONTENT = {
+    status.HTTP_403_FORBIDDEN: ("접근이 거부되었습니다", "요청하신 리소스에 접근할 수 없습니다."),
+    status.HTTP_404_NOT_FOUND: ("페이지를 찾을 수 없습니다", "요청하신 리소스를 찾지 못했습니다."),
+    status.HTTP_500_INTERNAL_SERVER_ERROR: ("서버 오류", "예기치 못한 오류가 발생했습니다."),
+}
+
+
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = await auth_manager.authenticate_user(form_data.username, form_data.password)
@@ -47,7 +59,38 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.exception_handler(HTTPException)
-async def unicorn_exception_handler(request: Request, exc: HTTPException):
-    response = RedirectResponse("/login/?errors=401", status_code=status.HTTP_302_FOUND)
-    return response
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+        return RedirectResponse("/login/?error=unauthorized", status_code=status.HTTP_302_FOUND)
+
+    title, default_message = ERROR_PAGE_CONTENT.get(
+        exc.status_code, ("오류가 발생했습니다", "요청을 처리할 수 없습니다.")
+    )
+    message = exc.detail if exc.detail else default_message
+    context = {
+        "request": request,
+        "login": False,
+        "data": {"code": exc.status_code, "title": title, "message": message},
+    }
+    return templates.TemplateResponse("error.html", context, status_code=exc.status_code)
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception):
+    logger.exception("Unhandled application error", exc_info=exc)
+    title, message = ERROR_PAGE_CONTENT[status.HTTP_500_INTERNAL_SERVER_ERROR]
+    context = {
+        "request": request,
+        "login": False,
+        "data": {
+            "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+            "title": title,
+            "message": message,
+        },
+    }
+    return templates.TemplateResponse(
+        "error.html", context, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR
+    )
+

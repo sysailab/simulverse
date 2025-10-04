@@ -36,6 +36,15 @@ cp .env.example .env
 
 # Quick Start
 
+## 0. MongoDB Index Setup
+```bash
+cd manage
+python create_indexes.py
+```
+
+이 스크립트는 핵심 컬렉션(users, spaces, scenes, links)에 필요한 인덱스를 생성합니다.
+`manage/db_setup.py` 실행 시 자동으로 호출되지만, 스키마 변경 후에는 별도로 실행해 인덱스를 갱신할 수 있습니다.
+
 ## 1. Database Setup (테스트 데이터 생성)
 ```bash
 cd manage
@@ -53,7 +62,18 @@ python db_setup.py
 - Email: `editor@test.com` / Password: `test1234`
 - Email: `viewer@test.com` / Password: `test1234`
 
-## 2. Database Drop (데이터 삭제)
+## 2. POI 추가 및 관리 가이드
+1. 웹앱을 실행하고 `editor@test.com / test1234` 계정으로 로그인합니다.
+2. `/view/`에서 원하는 공간을 선택하고 씬 편집 페이지(`/space/scene/edit/{space_id}/{scene_id}`)로 이동합니다.
+3. `Points of Interest` 테이블 우측 상단의 `POI 추가` 버튼을 눌러 모달에서 타입, 제목, 좌표 등을 입력하고 저장합니다.
+4. 생성된 POI는 테이블에서 확인할 수 있으며, 필요 시 `삭제` 버튼으로 제거할 수 있습니다.
+5. 씬 뷰(`/space/scene/{space_id}/{scene_id}`)에 접속하면 방금 추가한 POI가 A-Frame 마커로 표시됩니다.
+
+**Tip**
+- 링크 POI는 `타겟 씬`을 지정하면 다른 씬으로 이동하는 포털이 됩니다.
+- 좌표/회전 값을 조정해 마커 위치를 세밀하게 배치할 수 있습니다.
+
+## 3. Database Drop (데이터 삭제)
 ⚠️ 주의: 모든 데이터가 삭제됩니다!
 ```bash
 cd manage

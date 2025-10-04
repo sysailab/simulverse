@@ -206,10 +206,10 @@
           <!-- select user access  -->
           yaw:  <input
             id="yaw"
-            placeholder="z coordinate"
+            placeholder="yaw"
             name="yaw"
             size="3px"
-            value="0"
+            value="{{link.yaw}}"
           />    
         </div>
 
@@ -217,10 +217,10 @@
           <!-- select user access  -->
           pitch:  <input
             id="pitch"
-            placeholder="z coordinate"
+            placeholder="pitch"
             name="pitch"
             size="3px"
-            value="0"
+            value="{{link.pitch}}"
           />    
         </div>
 
@@ -228,10 +228,10 @@
           <!-- select user access  -->
           roll:  <input
             id="roll"
-            placeholder="z coordinate"
+            placeholder="roll"
             name="roll"
             size="3px"
-            value="0"
+            value="{{link.roll}}"
           />    
         </div>
 
@@ -261,6 +261,176 @@
           </button>
         </div>
     </form>
+
+    <div class="container mt-5">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Points of Interest</h5>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm"
+          data-bs-toggle="modal"
+          data-bs-target="#addPoiModal"
+        >
+          POI 추가
+        </button>
+      </div>
+
+      {% if data.pois %}
+      <div class="table-responsive">
+        <table class="table table-sm align-middle">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">타입</th>
+              <th scope="col">제목</th>
+              <th scope="col">좌표 (x, y, z)</th>
+              <th scope="col">링크 대상</th>
+              <th scope="col" class="text-end">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for poi in data.pois %}
+            <tr>
+              <td>{{ poi.type|upper }}</td>
+              <td>{{ poi.title }}</td>
+              <td>{{ '%.2f'|format(poi.position.x if poi.position else 0) }}, {{ '%.2f'|format(poi.position.y if poi.position else 0) }}, {{ '%.2f'|format(poi.position.z if poi.position else 0) }}</td>
+              <td>
+                {% if poi.target_scene_id %}
+                  {{ poi.target_scene_id }}
+                {% else %}
+                  -
+                {% endif %}
+              </td>
+              <td class="text-end">
+                <form
+                  method="post"
+                  class="d-inline"
+                  action="{{ url_for('space_delete_poi', space_id=data.space_id, scene_id=data.scene_id, poi_id=poi.poi_id|string) }}"
+                  onsubmit="return confirm('선택한 POI를 삭제할까요?');"
+                >
+                  <button type="submit" class="btn btn-outline-danger btn-sm">삭제</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-muted mb-0">등록된 POI가 없습니다. "POI 추가" 버튼을 눌러 새 포인트를 만들어보세요.</p>
+      {% endif %}
+    </div>
+
+    <div class="modal fade" id="addPoiModal" tabindex="-1" aria-labelledby="addPoiModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+          <form method="post" action="{{ url_for('space_add_poi', space_id=data.space_id, scene_id=data.scene_id) }}">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addPoiModalLabel">POI 추가</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="row g-3">
+                {% set selected_type = poi_form.get('poi_type', 'info') %}
+                <div class="col-md-4">
+                  <label for="poi-type" class="form-label">타입</label>
+                  <select id="poi-type" class="form-select" name="poi_type">
+                    <option value="info" {% if selected_type == 'info' %}selected{% endif %}>정보</option>
+                    <option value="link" {% if selected_type == 'link' %}selected{% endif %}>링크</option>
+                    <option value="media" {% if selected_type == 'media' %}selected{% endif %}>미디어</option>
+                  </select>
+                </div>
+                <div class="col-md-8">
+                  <label for="poi-title" class="form-label">제목</label>
+                  <input
+                    type="text"
+                    id="poi-title"
+                    class="form-control"
+                    name="title"
+                    value="{{ poi_form.get('title', '') }}"
+                    required
+                  />
+                </div>
+                <div class="col-12">
+                  <label for="poi-description" class="form-label">설명</label>
+                  <textarea
+                    id="poi-description"
+                    class="form-control"
+                    name="description"
+                    rows="3"
+                  >{{ poi_form.get('description', '') }}</textarea>
+                </div>
+                <div class="col-12">
+                  <div class="row g-2">
+                    <div class="col-md-4">
+                      <label class="form-label">Position X</label>
+                      <input type="number" step="any" class="form-control" name="position_x" value="{{ poi_form.get('position_x', '0') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Position Y</label>
+                      <input type="number" step="any" class="form-control" name="position_y" value="{{ poi_form.get('position_y', '1.3') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Position Z</label>
+                      <input type="number" step="any" class="form-control" name="position_z" value="{{ poi_form.get('position_z', '-3') }}" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="row g-2">
+                    <div class="col-md-4">
+                      <label class="form-label">Rotation X</label>
+                      <input type="number" step="any" class="form-control" name="rotation_x" value="{{ poi_form.get('rotation_x', '0') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Rotation Y</label>
+                      <input type="number" step="any" class="form-control" name="rotation_y" value="{{ poi_form.get('rotation_y', '0') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Rotation Z</label>
+                      <input type="number" step="any" class="form-control" name="rotation_z" value="{{ poi_form.get('rotation_z', '0') }}" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="row g-2">
+                    <div class="col-md-4">
+                      <label class="form-label">Scale X</label>
+                      <input type="number" step="any" class="form-control" name="scale_x" value="{{ poi_form.get('scale_x', '1') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Scale Y</label>
+                      <input type="number" step="any" class="form-control" name="scale_y" value="{{ poi_form.get('scale_y', '1') }}" />
+                    </div>
+                    <div class="col-md-4">
+                      <label class="form-label">Scale Z</label>
+                      <input type="number" step="any" class="form-control" name="scale_z" value="{{ poi_form.get('scale_z', '1') }}" />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">타겟 씬</label>
+                  <select class="form-select" name="target_scene_id">
+                    <option value="">선택 안 함</option>
+                    {% set selected_target = poi_form.get('target_scene_id', '') %}
+                    {% for val, scene in data.scenes %}
+                    <option value="{{ val }}" {% if selected_target == val %}selected{% endif %}>{{ scene }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">이미지 ID (선택)</label>
+                  <input type="text" class="form-control" name="image_id" value="{{ poi_form.get('image_id', '') }}" />
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">닫기</button>
+              <button type="submit" class="btn btn-primary">추가</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
 
 </main>
 <!-- /.container -->
