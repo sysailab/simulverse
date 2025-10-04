@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 
 # 프로젝트 루트를 Python 경로에 추가
-sys.path.insert(0, str(Path(__file__).parent.parent))
+PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from motor.motor_asyncio import AsyncIOMotorClient
 import motor.motor_asyncio
@@ -17,6 +18,7 @@ from datetime import datetime
 
 # app 모듈 import
 from app.core.libs.utils import get_password_hash
+from app.core.config import settings
 
 
 async def seed_database():
@@ -24,11 +26,11 @@ async def seed_database():
 
     # MongoDB 연결
     print("🔌 MongoDB 연결 중...")
-    client = AsyncIOMotorClient("mongodb://localhost:27017/")
-    db = client["simulverse"]  # 실제 DB 사용 (주의!)
+    client = AsyncIOMotorClient(settings.MONGODB_URL)
+    db = client[settings.MONGODB_DATABASE]  # 실제 DB 사용 (주의!)
 
     # 또는 테스트 DB 사용
-    # db = client["simulverse_test"]
+    # db = client[f"{settings.MONGODB_DATABASE}_test"]
 
     print("🌱 시드 데이터 생성 시작...\n")
 

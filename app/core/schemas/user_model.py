@@ -41,6 +41,8 @@ class UserRegisterForm:
             self.errors.append("Email is required")
         if not self.password or not len(self.password) >= 4:
             self.errors.append("Password must be > 4 chars")
+        elif len(self.password) > 72:
+            self.errors.append("Password must be 72 characters or fewer")
         if self.password != self.rpassword:
             self.errors.append("You have entered different password.")
         if self.agreement == None:
@@ -66,6 +68,8 @@ class UserLoginForm:
             self.errors.append("Email is required")
         if not self.password or not len(self.password) >= 4:
             self.errors.append("Password must be > 4 chars")
+        elif len(self.password) > 72:
+            self.errors.append("Password must be 72 characters or fewer")
         if not self.errors:
             return True
         return False

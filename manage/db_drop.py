@@ -8,9 +8,11 @@ import sys
 from pathlib import Path
 
 # 프로젝트 루트를 Python 경로에 추가
-sys.path.insert(0, str(Path(__file__).parent.parent))
+PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from motor.motor_asyncio import AsyncIOMotorClient
+from app.core.config import settings
 
 
 async def drop_database():
@@ -31,9 +33,12 @@ async def drop_database():
     print()
 
     # 데이터베이스 선택
+    default_db = settings.MONGODB_DATABASE
+    test_db = f"{default_db}_test"
+
     print("삭제할 데이터베이스를 선택하세요:")
-    print("  1. simulverse (운영 DB) ⚠️ ")
-    print("  2. simulverse_test (테스트 DB)")
+    print(f"  1. {default_db} (운영 DB) ⚠️ ")
+    print(f"  2. {test_db} (테스트 DB)")
     print("  3. 취소")
     print()
 
@@ -43,7 +48,13 @@ async def drop_database():
         print("\n✅ 작업 취소됨")
         return
 
-    db_name = "simulverse" if choice == "1" else "simulverse_test"
+    if choice == "1":
+        db_name = default_db
+    elif choice == "2":
+        db_name = test_db
+    else:
+        print("\n❌ 잘못된 선택. 작업 취소됨")
+        return
 
     # 최종 확인
     print()
@@ -56,7 +67,7 @@ async def drop_database():
 
     # MongoDB 연결
     print(f"\n🔌 MongoDB 연결 중...")
-    client = AsyncIOMotorClient("mongodb://localhost:27017/")
+    client = AsyncIOMotorClient(settings.MONGODB_URL)
     db = client[db_name]
 
     print(f"🗑️  '{db_name}' 데이터베이스 삭제 중...")

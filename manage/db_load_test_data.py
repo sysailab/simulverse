@@ -1,14 +1,16 @@
-from instance import config
+import sys
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
 import motor.motor_asyncio
 from bson import ObjectId
 
-from passlib.context import CryptContext
 import pprint
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
-def gepassword_hash(password):
-    return pwd_context.hash(password)
+from app.core.config import settings
+from app.core.libs.utils import get_password_hash
 
 async def do_check(db, collections:list):
     for item in collections:
@@ -18,19 +20,20 @@ async def do_check(db, collections:list):
             pprint.pprint(document)
 
 async def do_insert(db):
+    hashed = get_password_hash('test1234')
     data = [{'_id': ObjectId('632f214ab763ee36b2407777'),
             'email': 'cbchoi@example.com',
-            'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
+            'hashed_password': hashed,
             'spaces': {'632f2162b763ee36b2407778':'Editor'},
             'userid': 'cbchoi'},
             {'_id': ObjectId('632f214ab763ee36b2407778'),
             'email': 'c@c.c',
-            'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
+            'hashed_password': hashed,
             'spaces': {},
             'userid': 'cbchoi2'},
             {'_id': ObjectId('632f214ab763ee36b2407770'),
             'email': 'd@d.d',
-            'hashed_password': '$2b$12$2tTNtFUdYJ0N5mOr9dZH8uC.q3T6Q9Rq3E52Mj8cTzUN/rguHpBnq',
+            'hashed_password': hashed,
             'spaces': {},
             'userid': 'cbchoi2'},
             ]
@@ -55,9 +58,9 @@ async def do_insert(db):
             {'_id': ObjectId('632f2186b763ee36b2407773'), 'target_id':ObjectId('632f2186b763ee36b240777b'), 'x':'0', 'y':'1', 'z':'-6', 'yaw':'0', 'pitch':"0", "roll":"0"}]
     await db['links'].insert_many(data)
 
-client = motor.motor_asyncio.AsyncIOMotorClient(config.MONGODB_URL)
+client = motor.motor_asyncio.AsyncIOMotorClient(settings.MONGODB_URL)
 
-db = client["simulverse"]
+db = client[settings.MONGODB_DATABASE]
 db.drop_collection('users')
 db.drop_collection('spaces')
 db.drop_collection('scenes')
